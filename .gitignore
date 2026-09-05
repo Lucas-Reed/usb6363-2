@@ -1,0 +1,19 @@
+# Python 运行缓存
+__pycache__/
+*.py[cod]
+
+# 虚拟环境
+.venv/
+venv/
+
+# NI-DAQmx / 双峰查看器生成的实验数据文件
+data/
+
+# 编辑器和系统临时文件
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# 本地源码压缩备份
+usb6363-1-master.zip

@@ -1,0 +1,3055 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>双峰波形查看器</title>
+<style>
+  :root {
+    --bg: #f4f6f8;
+    --panel: #ffffff;
+    --line: #d7dde5;
+    --text: #17202a;
+    --muted: #697586;
+    --blue: #1f6feb;
+    --green: #16833a;
+    --red: #c62828;
+    --amber: #9a6700;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", Arial, sans-serif;
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    overflow: hidden;
+  }
+  aside {
+    background: var(--panel);
+    border-right: 1px solid var(--line);
+    padding: 12px;
+    overflow: auto;
+  }
+  main {
+    min-width: 0;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: 10px;
+    padding: 12px;
+  }
+  h1 { font-size: 18px; margin: 0 0 12px; }
+  h2 {
+    font-size: 14px;
+    margin: 18px 0 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--line);
+  }
+  label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin: 8px 0 4px;
+  }
+  input, select, button {
+    width: 100%;
+    font: inherit;
+    font-size: 13px;
+  }
+  input, select {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 7px 8px;
+    background: #fff;
+    color: var(--text);
+  }
+  input[type="checkbox"] {
+    width: auto;
+    margin-right: 7px;
+  }
+  button {
+    border: 0;
+    border-radius: 6px;
+    padding: 8px 10px;
+    background: var(--blue);
+    color: white;
+    font-weight: 650;
+    cursor: pointer;
+  }
+  button.secondary { background: #59636f; }
+  button.green { background: var(--green); }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+  .grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .inline {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 10px;
+    color: var(--text);
+    font-size: 13px;
+  }
+  .status {
+    border: 1px solid var(--line);
+    background: var(--panel);
+    border-radius: 8px;
+    padding: 9px 10px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .status.error { color: var(--red); }
+  .status.ok { color: var(--green); }
+  .plots {
+    display: grid;
+    gap: 10px;
+    min-height: 0;
+    overflow: auto;
+    grid-auto-rows: minmax(220px, 1fr);
+  }
+  .plot {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    min-height: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .plot-title {
+    position: absolute;
+    left: 10px;
+    top: 8px;
+    background: rgba(255,255,255,0.88);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 3px 7px;
+    font-size: 12px;
+    color: var(--muted);
+    z-index: 2;
+  }
+  canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: crosshair;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  th, td {
+    text-align: right;
+    border-bottom: 1px solid var(--line);
+    padding: 6px 4px;
+  }
+  th:first-child, td:first-child { text-align: left; }
+  .footer {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 8px;
+  }
+  .mono { font-family: Consolas, "SFMono-Regular", monospace; }
+</style>
+</head>
+<body>
+<aside>
+  <h1>双峰波形查看器</h1>
+
+  <h2>默认值</h2>
+  <div class="actions">
+    <button class="secondary" onclick="saveDefaults()">保存为默认值</button>
+    <button class="secondary" onclick="resetDefaults()">恢复出厂默认</button>
+  </div>
+
+  <h2>采集</h2>
+  <label>AI 通道，逗号分隔</label>
+  <input id="channels" value="ai0, ai1">
+  <div class="grid2">
+    <div>
+      <label>采样率 / Hz</label>
+      <input id="rate" type="number" value="50000" step="1000">
+    </div>
+    <div>
+      <label>每通道点数</label>
+      <input id="samples" type="number" value="5000" step="100">
+    </div>
+  </div>
+  <div class="grid2">
+    <div>
+      <label>接线方式</label>
+      <select id="terminal_config">
+        <option value="DIFF">DIFF</option>
+        <option value="RSE">RSE</option>
+        <option value="NRSE">NRSE</option>
+      </select>
+    </div>
+    <div>
+      <label>超时 / s</label>
+      <input id="timeout" type="number" value="10" step="1">
+    </div>
+  </div>
+  <div class="grid2">
+    <div>
+      <label>AI 最小值 / V</label>
+      <input id="min_val" type="number" value="-5" step="0.5">
+    </div>
+    <div>
+      <label>AI 最大值 / V</label>
+      <input id="max_val" type="number" value="5" step="0.5">
+    </div>
+  </div>
+
+  <h2>PFI 硬件触发</h2>
+  <label class="inline"><input id="trigger_enabled" type="checkbox"> 等待 PFI 边沿后开始采集</label>
+  <div class="grid2">
+    <div>
+      <label>触发源</label>
+      <input id="trigger_source" value="PFI0">
+    </div>
+    <div>
+      <label>触发边沿</label>
+      <select id="trigger_edge">
+        <option value="RISING">RISING</option>
+        <option value="FALLING">FALLING</option>
+      </select>
+    </div>
+  </div>
+  <label>PFI 重新对齐间隔 / 帧，0 表示关闭</label>
+  <input id="resync_every_frames" type="number" value="0" min="0" step="1">
+
+  <div class="actions">
+    <button id="captureBtn" onclick="captureFrame()">抓取最新帧</button>
+    <button class="green" id="saveBtn" onclick="saveFrame()" disabled>保存样本</button>
+  </div>
+
+  <h2>历史样本</h2>
+  <select id="saved_samples"></select>
+  <div class="actions">
+    <button class="secondary" onclick="refreshSavedSamples()">刷新列表</button>
+    <button class="secondary" onclick="loadSavedSample()">加载样本</button>
+  </div>
+
+  <h2>连续采集</h2>
+  <input id="stream_source" type="hidden" value="unified_stream">
+  <div class="grid2">
+    <div>
+      <label>连续状态</label>
+      <input id="stream_status" value="停止" readonly>
+    </div>
+    <div>
+      <label>最新帧编号</label>
+      <input id="stream_frame_id" value="0" readonly>
+    </div>
+  </div>
+  <div class="grid2">
+    <div>
+      <label>每帧时长 / ms</label>
+      <input id="frame_duration_ms" value="--" readonly>
+    </div>
+    <div>
+      <label>帧率 / Hz</label>
+      <input id="frame_rate_hz" value="--" readonly>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="green" id="streamStartBtn" onclick="startBackendStream()">开始连续采集</button>
+    <button class="secondary" id="streamStopBtn" onclick="stopBackendStream()" disabled>停止连续采集</button>
+  </div>
+
+  <h2>视图</h2>
+  <div class="grid2">
+    <div>
+      <label>X 起点索引</label>
+      <input id="x_start" type="number" value="" placeholder="自动">
+    </div>
+    <div>
+      <label>X 终点索引</label>
+      <input id="x_end" type="number" value="" placeholder="自动">
+    </div>
+  </div>
+  <div class="actions">
+    <button class="secondary" onclick="applyXView()">应用范围</button>
+    <button class="secondary" onclick="resetXView()">显示全帧</button>
+  </div>
+
+  <h2>手动选峰</h2>
+  <label>点击波形时设置</label>
+  <select id="pick_target">
+    <option value="0">P1</option>
+    <option value="1">P2</option>
+    <option value="area_left">面积左零点</option>
+    <option value="area_right">面积右零点</option>
+    <option value="area2_left">面积 B 左零点</option>
+    <option value="area2_right">面积 B 右零点</option>
+  </select>
+  <div class="grid2">
+    <div>
+      <label>P1 索引</label>
+      <input id="peak0" type="number" value="642" step="1">
+    </div>
+    <div>
+      <label>P2 索引</label>
+      <input id="peak1" type="number" value="754" step="1">
+    </div>
+  </div>
+  <div class="grid2">
+    <div>
+      <label>面积左零点</label>
+      <input id="manual_area_left" type="number" value="" step="1" placeholder="点击或手填">
+    </div>
+    <div>
+      <label>面积右零点</label>
+      <input id="manual_area_right" type="number" value="" step="1" placeholder="点击或手填">
+    </div>
+  </div>
+  <div class="grid2">
+    <div>
+      <label>面积 B 左零点</label>
+      <input id="manual_area2_left" type="number" value="" step="1" placeholder="点击或手填">
+    </div>
+    <div>
+      <label>面积 B 右零点</label>
+      <input id="manual_area2_right" type="number" value="" step="1" placeholder="点击或手填">
+    </div>
+  </div>
+
+  <h2>测峰参数</h2>
+  <div class="grid2">
+    <div>
+      <label>分析通道序号</label>
+      <input id="analysis_channel_index" type="number" value="0" step="1">
+    </div>
+    <div>
+      <label>测峰模式</label>
+      <select id="peak_mode">
+        <option value="height">height</option>
+        <option value="area">area</option>
+      </select>
+    </div>
+  </div>
+  <div class="grid2">
+    <div>
+      <label>平滑窗口</label>
+      <input id="smooth_window" type="number" value="25" step="2">
+    </div>
+    <div>
+      <label>搜索半宽</label>
+      <input id="search_window_half" type="number" value="20" step="1">
+    </div>
+  </div>
+  <label>测量半宽</label>
+  <input id="measure_half" type="number" value="5" step="1">
+  <div class="actions">
+    <button class="secondary" onclick="measurePeaks()">重新测峰</button>
+    <button class="secondary" onclick="clearPeaks()">清空标记</button>
+  </div>
+
+  <h2>结果</h2>
+  <table>
+    <thead><tr><th>峰</th><th>索引</th><th>测量值</th><th>窗口</th></tr></thead>
+    <tbody id="peakRows">
+      <tr><td>P1</td><td>--</td><td>--</td><td>--</td></tr>
+      <tr><td>P2</td><td>--</td><td>--</td><td>--</td></tr>
+    </tbody>
+  </table>
+  <h2>手动面积</h2>
+  <table>
+    <tbody id="manualAreaRows">
+      <tr><td>面积</td><td>--</td></tr>
+      <tr><td>最近抖动</td><td>--</td></tr>
+    </tbody>
+  </table>
+  <h2>双面积统计</h2>
+  <table>
+    <thead><tr><th>窗口</th><th>范围</th><th>当前</th><th>最近均值/标准差</th></tr></thead>
+    <tbody id="dualAreaRows">
+      <tr><td>A</td><td>--</td><td>--</td><td>--</td></tr>
+      <tr><td>B</td><td>--</td><td>--</td><td>--</td></tr>
+    </tbody>
+  </table>
+  <h2>双峰高统计（慢漂记录）</h2>
+  <table>
+    <thead><tr><th>窗口</th><th>峰顶索引</th><th>当前峰高</th><th>最近均值/标准差/EMA</th></tr></thead>
+    <tbody id="dualPeakHeightRows">
+      <tr><td>A</td><td>--</td><td>--</td><td>--</td></tr>
+      <tr><td>B</td><td>--</td><td>--</td><td>--</td></tr>
+    </tbody>
+  </table>
+  <h2>峰顶百分比统计（慢漂记录）</h2>
+  <table>
+    <thead><tr><th>窗口</th><th>范围/选点</th><th>当前</th><th>最近均值/标准差/EMA</th></tr></thead>
+    <tbody id="dualTopRows">
+      <tr><td>A</td><td>--</td><td>--</td><td>--</td></tr>
+      <tr><td>B</td><td>--</td><td>--</td><td>--</td></tr>
+    </tbody>
+  </table>
+
+  <h2>慢漂记录</h2>
+  <div class="grid2">
+    <div>
+      <label>统计窗口 / 帧</label>
+      <input id="trend_window_frames" type="number" value="200" min="2" step="1">
+    </div>
+    <div>
+      <label>记录频率 / Hz</label>
+      <input id="trend_record_hz" type="number" value="1" min="0.01" step="0.5">
+    </div>
+  </div>
+  <div class="grid2">
+    <div>
+      <label>自动停止 / min，0 表示不限时</label>
+      <input id="trend_duration_minutes" type="number" value="120" min="0" step="10">
+    </div>
+    <div>
+      <label>已运行 / 剩余</label>
+      <input id="trend_time_status" value="--" readonly>
+    </div>
+  </div>
+  <div class="grid2">
+    <div>
+      <label>峰顶统计比例 / %</label>
+      <input id="top_percent" type="number" value="10" min="1" max="100" step="1">
+    </div>
+    <div>
+      <label>面积、峰高和 Top EMA alpha</label>
+      <input id="trend_ema_alpha" type="number" value="0.02" min="0" max="1" step="0.005">
+    </div>
+  </div>
+  <label class="inline">
+    <input id="auto_track_enabled" type="checkbox">
+    自动跟随面积窗口内最高点
+  </label>
+  <div class="grid2">
+    <div>
+      <label>跟随平滑窗口 / 点</label>
+      <input id="auto_track_smooth_window" type="number" value="9" min="1" step="2">
+    </div>
+    <div>
+      <label>每帧最大移动 / 点</label>
+      <input id="auto_track_max_shift" type="number" value="5" min="0" step="1">
+    </div>
+  </div>
+  <div class="grid2">
+    <div>
+      <label>记录状态</label>
+      <input id="trend_status" value="停止" readonly>
+    </div>
+    <div>
+      <label>已写行数</label>
+      <input id="trend_records" value="0" readonly>
+    </div>
+  </div>
+  <label>CSV 文件</label>
+  <input id="trend_file" value="" readonly>
+  <label>最新统计</label>
+  <input id="trend_latest" value="--" readonly>
+
+  <h2>逐帧窗口电压（临时测试）</h2>
+  <label>记录窗口</label>
+  <select id="window_voltage_mode">
+    <option value="none" selected>不记录</option>
+    <option value="a">仅窗口 A</option>
+    <option value="b">仅窗口 B</option>
+    <option value="both">窗口 A+B</option>
+  </select>
+  <label class="inline">
+    <input id="record_full_frame" type="checkbox">
+    同时记录完整分析通道波形
+  </label>
+  <label>NPZ 输出目录</label>
+  <input id="window_voltage_output_dir" value="data/two_peak_window_voltage">
+  <div class="grid2">
+    <div>
+      <label>写盘状态</label>
+      <input id="window_voltage_status" value="关闭" readonly>
+    </div>
+    <div>
+      <label>数据量估计</label>
+      <input id="window_voltage_estimate" value="--" readonly>
+    </div>
+  </div>
+  <label>记录进度</label>
+  <input id="window_voltage_progress" value="--" readonly>
+  <label>记录目录</label>
+  <input id="window_voltage_directory" value="" readonly>
+  <div class="plot" style="height:160px; margin-top:8px;">
+    <canvas id="areaTrendCanvas"></canvas>
+  </div>
+  <div class="plot" style="height:160px; margin-top:8px;">
+    <canvas id="peakHeightTrendCanvas"></canvas>
+  </div>
+  <div class="plot" style="height:160px; margin-top:8px;">
+    <canvas id="topTrendCanvas"></canvas>
+  </div>
+  <div class="actions">
+    <button class="green" id="trendStartBtn" onclick="startAreaTrend()">开始慢漂记录</button>
+    <button class="secondary" id="trendApplyWindowsBtn" onclick="applyRunningAreaWindows()" disabled>应用运行中边界</button>
+    <button class="secondary" id="trendStopBtn" onclick="stopAreaTrend()" disabled>停止慢漂记录</button>
+  </div>
+
+  <h2>临时同步测试</h2>
+  <label>功率慢漂服务</label>
+  <input id="sync_power_api_url" value="http://127.0.0.1:8767">
+  <div class="grid2">
+    <div>
+      <label>功率端预备</label>
+      <input id="sync_power_armed" value="未连接" readonly>
+    </div>
+    <div>
+      <label>同步状态</label>
+      <input id="sync_status" value="停止" readonly>
+    </div>
+  </div>
+  <label>Session ID</label>
+  <input id="sync_session_id" value="" readonly>
+  <label>同步清单</label>
+  <input id="sync_manifest_file" value="" readonly>
+  <div class="actions">
+    <button class="green" id="syncStartBtn" onclick="startSyncTest()">同步开始功率与窗口记录</button>
+    <button class="secondary" id="syncStopBtn" onclick="stopSyncTest()" disabled>同步停止</button>
+  </div>
+
+  <h2>AO 扫描标定</h2>
+  <div class="grid2">
+    <div>
+      <label>AO 通道</label>
+      <input id="ao_scan_channel" value="ao0">
+    </div>
+    <div>
+      <label>测量字段</label>
+      <select id="ao_scan_measure_field">
+        <option value="area_ema">area_ema</option>
+        <option value="area_mean">area_mean</option>
+        <option value="area2_ema">area2_ema</option>
+        <option value="area2_mean">area2_mean</option>
+        <option value="area_sum_ema" selected>area_sum_ema</option>
+        <option value="area_sum_mean">area_sum_mean</option>
+      </select>
+    </div>
+  </div>
+  <div class="grid2">
+    <div>
+      <label>起始电压 / V</label>
+      <input id="ao_scan_start_voltage" type="number" value="0" step="0.01">
+    </div>
+    <div>
+      <label>终止电压 / V</label>
+      <input id="ao_scan_stop_voltage" type="number" value="1" step="0.01">
+    </div>
+  </div>
+  <div class="grid2">
+    <div>
+      <label>步长 / V</label>
+      <input id="ao_scan_step_voltage" type="number" value="0.05" step="0.01">
+    </div>
+    <div>
+      <label>结束恢复电压 / V，留空则保持</label>
+      <input id="ao_scan_restore_voltage" type="number" value="" step="0.01" placeholder="保持最后电压">
+    </div>
+  </div>
+  <div class="grid2">
+    <div>
+      <label>AO 最小值 / V</label>
+      <input id="ao_scan_min_val" type="number" value="-10" step="0.1">
+    </div>
+    <div>
+      <label>AO 最大值 / V</label>
+      <input id="ao_scan_max_val" type="number" value="10" step="0.1">
+    </div>
+  </div>
+  <div class="grid2">
+    <div>
+      <label>改电压后等待 / s</label>
+      <input id="ao_scan_settle_s" type="number" value="0.5" min="0" step="0.1">
+    </div>
+    <div>
+      <label>每点测量时间 / s</label>
+      <input id="ao_scan_dwell_s" type="number" value="2" min="0.1" step="0.1">
+    </div>
+  </div>
+  <div class="grid2">
+    <div>
+      <label>扫描状态</label>
+      <input id="ao_scan_status" value="停止" readonly>
+    </div>
+    <div>
+      <label>已完成点数</label>
+      <input id="ao_scan_points" value="0" readonly>
+    </div>
+  </div>
+  <label>标定 CSV 文件</label>
+  <input id="ao_scan_file" value="" readonly>
+  <label>最新标定点</label>
+  <input id="ao_scan_latest" value="--" readonly>
+  <div class="plot" style="height:160px; margin-top:8px;">
+    <canvas id="aoScanCanvas"></canvas>
+  </div>
+  <div class="actions">
+    <button class="green" id="aoScanStartBtn" onclick="startAoScan()">开始 AO 扫描</button>
+    <button class="secondary" id="aoScanStopBtn" onclick="stopAoScan()" disabled>停止 AO 扫描</button>
+  </div>
+
+  <h2>单路 AO 诊断</h2>
+  <div class="grid2">
+    <div>
+      <label>AO 通道</label>
+      <input id="ao_test_channel" value="ao0">
+    </div>
+    <div>
+      <label>输出电压 / V</label>
+      <input id="ao_test_value" type="number" value="2.0" step="0.01">
+    </div>
+  </div>
+  <div class="grid2">
+    <div>
+      <label>最小电压 / V</label>
+      <input id="ao_test_min" type="number" value="-10.0" step="0.1">
+    </div>
+    <div>
+      <label>最大电压 / V</label>
+      <input id="ao_test_max" type="number" value="10.0" step="0.1">
+    </div>
+  </div>
+  <div class="actions">
+    <button class="secondary" onclick="writeAoTest()">写入单路 AO</button>
+  </div>
+
+  <h2>功率锁定参数</h2>
+  <div class="grid2">
+    <div>
+      <label>锁定模式</label>
+      <select id="lock_target_mode" onchange="updatePowerLockFormAvailability(false)">
+        <option value="fixed" selected>固定目标锁定</option>
+        <option value="follow_ratio">采样峰比值跟随</option>
+      </select>
+    </div>
+    <div>
+      <label>锁定更新检查周期 / s</label>
+      <input id="lock_update_s" type="number" value="1.0" min="0.1" step="0.1">
+    </div>
+  </div>
+  <div id="ratio_lock_settings" style="display:none">
+    <div class="grid2">
+      <div>
+        <label>采样峰（只读）</label>
+        <select id="lock_ratio_sample_peak" onchange="updatePowerLockFormAvailability(false)">
+          <option value="A" selected>窗口 A</option>
+          <option value="B">窗口 B</option>
+        </select>
+      </div>
+      <div>
+        <label>锁定峰（写 AO）</label>
+        <input id="lock_ratio_lock_peak" value="窗口 B / AOM 路" readonly>
+      </div>
+    </div>
+    <div class="grid2">
+      <div>
+        <label>比值统计指标</label>
+        <select id="lock_ratio_metric">
+          <option value="area" selected>面积 EMA</option>
+          <option value="top">Top% EMA</option>
+          <option value="peak_height">峰高 EMA</option>
+        </select>
+      </div>
+      <div>
+        <label>目标比值（锁定峰 / 采样峰）</label>
+        <input id="lock_follow_ratio" type="number" value="1.0" min="0.000001" step="0.001">
+      </div>
+    </div>
+    <div class="actions">
+      <button class="secondary" type="button" onclick="useCurrentPeakRatio()">取当前比例</button>
+    </div>
+  </div>
+  <div class="grid2" id="fixed_lock_enable_controls">
+    <label><input id="lock_eom_enabled" type="checkbox" checked> 启用 EOM 路</label>
+    <label><input id="lock_aom_enabled" type="checkbox" checked> 启用 AOM 路</label>
+  </div>
+  <div class="grid2">
+    <div>
+      <label>EOM AO 通道</label>
+      <input id="lock_eom_channel" value="ao0">
+    </div>
+    <div id="lock_eom_fixed_feedback">
+      <label>EOM 反馈字段</label>
+      <select id="lock_eom_feedback">
+        <option value="area_ema" selected>area_ema</option>
+        <option value="area_mean">area_mean</option>
+        <option value="top_ema">top_ema</option>
+        <option value="top_mean">top_mean</option>
+      </select>
+    </div>
+  </div>
+  <div class="grid2">
+    <div id="lock_eom_fixed_target">
+      <label>EOM 反馈目标值</label>
+      <input id="lock_eom_target" type="number" value="4.7" step="0.01">
+    </div>
+    <div>
+      <label>EOM 初始电压 / V</label>
+      <input id="lock_eom_initial" type="number" value="2.0" step="0.01">
+    </div>
+  </div>
+  <div class="grid2">
+    <div>
+      <label>EOM 最小电压 / V</label>
+      <input id="lock_eom_min" type="number" value="1.0" step="0.01">
+    </div>
+    <div>
+      <label>EOM 最大电压 / V</label>
+      <input id="lock_eom_max" type="number" value="3.5" step="0.01">
+    </div>
+  </div>
+  <div class="grid2">
+    <div>
+      <label>EOM 控制方向</label>
+      <select id="lock_eom_direction">
+        <option value="-1" selected>电压增大，功率降低</option>
+        <option value="1">电压增大，功率升高</option>
+      </select>
+    </div>
+    <div>
+      <label>EOM 单步限幅 / V</label>
+      <input id="lock_eom_max_step" type="number" value="0.01" min="0" step="0.001">
+    </div>
+  </div>
+  <div class="grid2">
+    <div>
+      <label>EOM Kp</label>
+      <input id="lock_eom_kp" type="number" value="0" step="0.001">
+    </div>
+    <div>
+      <label>EOM Ki</label>
+      <input id="lock_eom_ki" type="number" value="0" step="0.001">
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div>
+      <label>AOM AO 通道</label>
+      <input id="lock_aom_channel" value="ao1">
+    </div>
+    <div id="lock_aom_fixed_feedback">
+      <label>AOM 反馈字段</label>
+      <select id="lock_aom_feedback">
+        <option value="area2_ema" selected>area2_ema</option>
+        <option value="area2_mean">area2_mean</option>
+        <option value="top2_ema">top2_ema</option>
+        <option value="top2_mean">top2_mean</option>
+      </select>
+    </div>
+  </div>
+  <div class="grid2">
+    <div id="lock_aom_fixed_target">
+      <label>AOM 反馈目标值</label>
+      <input id="lock_aom_target" type="number" value="4.7" step="0.01">
+    </div>
+    <div>
+      <label>AOM 初始电压 / V</label>
+      <input id="lock_aom_initial" type="number" value="2.0" step="0.01">
+    </div>
+  </div>
+  <div class="grid2">
+    <div>
+      <label>AOM 最小电压 / V</label>
+      <input id="lock_aom_min" type="number" value="0.0" step="0.01">
+    </div>
+    <div>
+      <label>AOM 最大电压 / V</label>
+      <input id="lock_aom_max" type="number" value="2.5" step="0.01">
+    </div>
+  </div>
+  <div class="grid2">
+    <div>
+      <label>AOM 控制方向</label>
+      <select id="lock_aom_direction">
+        <option value="1" selected>电压增大，功率升高</option>
+        <option value="-1">电压增大，功率降低</option>
+      </select>
+    </div>
+    <div>
+      <label>AOM 单步限幅 / V</label>
+      <input id="lock_aom_max_step" type="number" value="0.01" min="0" step="0.001">
+    </div>
+  </div>
+  <div class="grid2">
+    <div>
+      <label>AOM Kp</label>
+      <input id="lock_aom_kp" type="number" value="0" step="0.001">
+    </div>
+    <div>
+      <label>AOM Ki</label>
+      <input id="lock_aom_ki" type="number" value="0" step="0.001">
+    </div>
+  </div>
+  <div class="grid2">
+    <div>
+      <label>锁定状态</label>
+      <input id="power_lock_status" value="停止" readonly>
+    </div>
+    <div>
+      <label>更新次数</label>
+      <input id="power_lock_iterations" value="0" readonly>
+    </div>
+  </div>
+  <label>EOM 状态</label>
+  <input id="power_lock_eom_status" value="--" readonly>
+  <label>AOM 状态</label>
+  <input id="power_lock_aom_status" value="--" readonly>
+  <label>峰比值状态</label>
+  <input id="power_lock_ratio_status" value="--" readonly>
+  <label>锁定日志 CSV</label>
+  <input id="power_lock_log_file" value="--" readonly>
+  <div class="actions">
+    <button class="secondary" id="powerLockWriteInitialBtn" onclick="writePowerLockInitialAo()">写入初始 AO 电压</button>
+    <button class="green" id="powerLockStartBtn" onclick="startPowerLock()">启动锁定</button>
+    <button class="secondary" id="powerLockApplyBtn" onclick="applyPowerLockParameters()" disabled>应用运行中参数</button>
+    <button class="secondary" id="powerLockStopBtn" onclick="stopPowerLock()" disabled>停止锁定</button>
+  </div>
+</aside>
+
+<main>
+  <div id="status" class="status">查看器已打开。请先确认底层 API 服务正在运行。</div>
+  <div id="plots" class="plots"></div>
+  <div class="footer">
+    <div id="frameInfo" class="status">尚未采集。</div>
+    <div class="mono" id="cursorInfo"></div>
+  </div>
+</main>
+
+<script>
+let latestFrame = null;
+let latestMeasurement = null;
+let plotCanvases = [];
+let streamRunning = false;
+let streamTimer = null;
+let streamLastFrameId = 0;
+let streamPollInFlight = false;
+let streamConsecutiveErrors = 0;
+let trendTimer = null;
+let aoScanTimer = null;
+let powerLockTimer = null;
+let powerLockDisplayedRevision = 0;
+let syncTestTimer = null;
+let trendRunning = false;
+let latestTrendStats = null;
+let xViewStart = null;
+let xViewEnd = null;
+let manualAreaHistory = [];
+let manualArea2History = [];
+
+function getCaptureParams() {
+  return {
+    stream_source: document.getElementById('stream_source').value,
+    channels: document.getElementById('channels').value,
+    rate: Number(document.getElementById('rate').value),
+    samples: Number(document.getElementById('samples').value),
+    terminal_config: document.getElementById('terminal_config').value,
+    min_val: Number(document.getElementById('min_val').value),
+    max_val: Number(document.getElementById('max_val').value),
+    timeout: Number(document.getElementById('timeout').value),
+    trigger_enabled: document.getElementById('trigger_enabled').checked,
+    trigger_source: document.getElementById('trigger_source').value,
+    trigger_edge: document.getElementById('trigger_edge').value,
+    resync_every_frames: Number(document.getElementById('resync_every_frames').value),
+  };
+}
+
+function getMeasureParams() {
+  return {
+    peak_indices: [
+      Number(document.getElementById('peak0').value),
+      Number(document.getElementById('peak1').value),
+    ],
+    analysis_channel_index: Number(document.getElementById('analysis_channel_index').value),
+    smooth_window: Number(document.getElementById('smooth_window').value),
+    search_window_half: Number(document.getElementById('search_window_half').value),
+    measure_half: Number(document.getElementById('measure_half').value),
+    peak_mode: document.getElementById('peak_mode').value,
+    manual_area_left: document.getElementById('manual_area_left').value,
+    manual_area_right: document.getElementById('manual_area_right').value,
+    manual_area2_left: document.getElementById('manual_area2_left').value,
+    manual_area2_right: document.getElementById('manual_area2_right').value,
+  };
+}
+
+function getViewParams() {
+  return {
+    x_start: document.getElementById('x_start').value,
+    x_end: document.getElementById('x_end').value,
+  };
+}
+
+function getTrendParams() {
+  return {
+    analysis_channel_index: Number(document.getElementById('analysis_channel_index').value),
+    area_left: document.getElementById('manual_area_left').value,
+    area_right: document.getElementById('manual_area_right').value,
+    area2_left: document.getElementById('manual_area2_left').value,
+    area2_right: document.getElementById('manual_area2_right').value,
+    window_frames: Number(document.getElementById('trend_window_frames').value),
+    record_hz: Number(document.getElementById('trend_record_hz').value),
+    duration_minutes: Number(document.getElementById('trend_duration_minutes').value),
+    ema_alpha: Number(document.getElementById('trend_ema_alpha').value),
+    top_percent: Number(document.getElementById('top_percent').value),
+    auto_track_enabled: document.getElementById('auto_track_enabled').checked,
+    auto_track_smooth_window: Number(document.getElementById('auto_track_smooth_window').value),
+    auto_track_max_shift: Number(document.getElementById('auto_track_max_shift').value),
+    window_voltage_mode: document.getElementById('window_voltage_mode').value,
+    record_full_frame: document.getElementById('record_full_frame').checked,
+    window_voltage_output_dir: document.getElementById('window_voltage_output_dir').value,
+  };
+}
+
+function getSyncTestParams() {
+  return {
+    power_api_url: document.getElementById('sync_power_api_url').value,
+  };
+}
+
+function getAoScanParams() {
+  return {
+    channel: document.getElementById('ao_scan_channel').value,
+    start_voltage: Number(document.getElementById('ao_scan_start_voltage').value),
+    stop_voltage: Number(document.getElementById('ao_scan_stop_voltage').value),
+    step_voltage: Number(document.getElementById('ao_scan_step_voltage').value),
+    min_val: Number(document.getElementById('ao_scan_min_val').value),
+    max_val: Number(document.getElementById('ao_scan_max_val').value),
+    settle_s: Number(document.getElementById('ao_scan_settle_s').value),
+    dwell_s: Number(document.getElementById('ao_scan_dwell_s').value),
+    measure_field: document.getElementById('ao_scan_measure_field').value,
+    restore_voltage: document.getElementById('ao_scan_restore_voltage').value,
+  };
+}
+
+function getAoTestParams() {
+  return {
+    channel: document.getElementById('ao_test_channel').value,
+    value: Number(document.getElementById('ao_test_value').value),
+    min_val: Number(document.getElementById('ao_test_min').value),
+    max_val: Number(document.getElementById('ao_test_max').value),
+  };
+}
+
+function getPowerLockParams() {
+  return {
+    lock_target_mode: document.getElementById('lock_target_mode').value,
+    lock_ratio_sample_peak: document.getElementById('lock_ratio_sample_peak').value,
+    lock_ratio_metric: document.getElementById('lock_ratio_metric').value,
+    lock_follow_ratio: Number(document.getElementById('lock_follow_ratio').value),
+    lock_update_s: Number(document.getElementById('lock_update_s').value),
+    lock_eom_enabled: document.getElementById('lock_eom_enabled').checked,
+    lock_eom_channel: document.getElementById('lock_eom_channel').value,
+    lock_eom_feedback: document.getElementById('lock_eom_feedback').value,
+    lock_eom_target: Number(document.getElementById('lock_eom_target').value),
+    lock_eom_initial: Number(document.getElementById('lock_eom_initial').value),
+    lock_eom_min: Number(document.getElementById('lock_eom_min').value),
+    lock_eom_max: Number(document.getElementById('lock_eom_max').value),
+    lock_eom_direction: Number(document.getElementById('lock_eom_direction').value),
+    lock_eom_max_step: Number(document.getElementById('lock_eom_max_step').value),
+    lock_eom_kp: Number(document.getElementById('lock_eom_kp').value),
+    lock_eom_ki: Number(document.getElementById('lock_eom_ki').value),
+    lock_aom_enabled: document.getElementById('lock_aom_enabled').checked,
+    lock_aom_channel: document.getElementById('lock_aom_channel').value,
+    lock_aom_feedback: document.getElementById('lock_aom_feedback').value,
+    lock_aom_target: Number(document.getElementById('lock_aom_target').value),
+    lock_aom_initial: Number(document.getElementById('lock_aom_initial').value),
+    lock_aom_min: Number(document.getElementById('lock_aom_min').value),
+    lock_aom_max: Number(document.getElementById('lock_aom_max').value),
+    lock_aom_direction: Number(document.getElementById('lock_aom_direction').value),
+    lock_aom_max_step: Number(document.getElementById('lock_aom_max_step').value),
+    lock_aom_kp: Number(document.getElementById('lock_aom_kp').value),
+    lock_aom_ki: Number(document.getElementById('lock_aom_ki').value),
+  };
+}
+
+function getAllUiParameters() {
+  return {
+    ...getCaptureParams(),
+    ...getMeasureParams(),
+    ...getViewParams(),
+    ...getTrendParams(),
+    ...getAoScanParams(),
+    ...getAoTestParams(),
+    ...getPowerLockParams(),
+    ...getSyncTestParams(),
+  };
+}
+
+function setInputValue(id, value) {
+  const element = document.getElementById(id);
+  if (!element || value === undefined || value === null) return;
+  if (element.type === 'checkbox') {
+    element.checked = Boolean(value);
+  } else {
+    element.value = Array.isArray(value) ? value.join(', ') : value;
+  }
+}
+
+function firstDefined(...values) {
+  for (const value of values) {
+    if (value !== undefined && value !== null) return value;
+  }
+  return undefined;
+}
+
+function applyDefaultsToUi(defaults) {
+  setInputValue('channels', defaults.channels || defaults.ai_channels);
+  setInputValue('rate', defaults.rate || defaults.sample_rate);
+  setInputValue('samples', defaults.samples || defaults.samples_per_frame);
+  setInputValue('terminal_config', defaults.terminal_config);
+  setInputValue('timeout', defaults.timeout);
+  setInputValue('min_val', defaults.min_val || defaults.ai_min_val);
+  setInputValue('max_val', defaults.max_val || defaults.ai_max_val);
+  setInputValue('trigger_enabled', defaults.trigger_enabled);
+  setInputValue('trigger_source', defaults.trigger_source);
+  setInputValue('trigger_edge', defaults.trigger_edge);
+  setInputValue('resync_every_frames', defaults.resync_every_frames);
+  setInputValue('stream_source', defaults.stream_source);
+  if (defaults.peak_indices) {
+    setInputValue('peak0', defaults.peak_indices[0]);
+    setInputValue('peak1', defaults.peak_indices[1]);
+  }
+  setInputValue('peak0', defaults.peak0);
+  setInputValue('peak1', defaults.peak1);
+  setInputValue('manual_area_left', defaults.manual_area_left);
+  setInputValue('manual_area_right', defaults.manual_area_right);
+  setInputValue('manual_area2_left', defaults.manual_area2_left);
+  setInputValue('manual_area2_right', defaults.manual_area2_right);
+  setInputValue('analysis_channel_index', defaults.analysis_channel_index);
+  setInputValue('smooth_window', defaults.smooth_window);
+  setInputValue('search_window_half', defaults.search_window_half || defaults.window_half);
+  setInputValue('measure_half', defaults.measure_half || defaults.peak_avg_half);
+  setInputValue('peak_mode', defaults.peak_mode);
+  setInputValue('x_start', defaults.x_start);
+  setInputValue('x_end', defaults.x_end);
+  setInputValue('trend_window_frames', defaults.window_frames || defaults.trend_window_frames);
+  setInputValue('trend_record_hz', defaults.record_hz || defaults.trend_record_hz);
+  setInputValue(
+    'trend_duration_minutes',
+    firstDefined(defaults.duration_minutes, defaults.trend_duration_minutes, 120),
+  );
+  setInputValue(
+    'trend_ema_alpha',
+    defaults.ema_alpha !== undefined ? defaults.ema_alpha : defaults.trend_ema_alpha,
+  );
+  setInputValue('top_percent', firstDefined(defaults.top_percent, 10));
+  setInputValue('auto_track_enabled', defaults.auto_track_enabled);
+  setInputValue('auto_track_smooth_window', firstDefined(defaults.auto_track_smooth_window, 9));
+  setInputValue('auto_track_max_shift', firstDefined(defaults.auto_track_max_shift, 5));
+  setInputValue('window_voltage_mode', firstDefined(defaults.window_voltage_mode, 'none'));
+  setInputValue('record_full_frame', firstDefined(defaults.record_full_frame, false));
+  setInputValue(
+    'window_voltage_output_dir',
+    firstDefined(defaults.window_voltage_output_dir, 'data/two_peak_window_voltage'),
+  );
+  setInputValue(
+    'sync_power_api_url',
+    firstDefined(defaults.power_api_url, defaults.sync_power_api_url, 'http://127.0.0.1:8767'),
+  );
+  setInputValue('ao_scan_channel', firstDefined(defaults.channel, defaults.ao_scan_channel));
+  setInputValue('ao_scan_start_voltage', firstDefined(defaults.start_voltage, defaults.ao_scan_start_voltage));
+  setInputValue('ao_scan_stop_voltage', firstDefined(defaults.stop_voltage, defaults.ao_scan_stop_voltage));
+  setInputValue('ao_scan_step_voltage', firstDefined(defaults.step_voltage, defaults.ao_scan_step_voltage));
+  setInputValue('ao_scan_min_val', firstDefined(defaults.ao_min_val, defaults.ao_scan_min_val));
+  setInputValue('ao_scan_max_val', firstDefined(defaults.ao_max_val, defaults.ao_scan_max_val));
+  setInputValue('ao_scan_settle_s', firstDefined(defaults.settle_s, defaults.ao_scan_settle_s));
+  setInputValue('ao_scan_dwell_s', firstDefined(defaults.dwell_s, defaults.ao_scan_dwell_s));
+  setInputValue('ao_scan_measure_field', firstDefined(defaults.measure_field, defaults.ao_scan_measure_field));
+  setInputValue('ao_scan_restore_voltage', firstDefined(defaults.restore_voltage, defaults.ao_scan_restore_voltage));
+  setInputValue('ao_test_channel', firstDefined(defaults.ao_test_channel, 'ao0'));
+  setInputValue('ao_test_value', firstDefined(defaults.ao_test_value, 2.0));
+  setInputValue('ao_test_min', firstDefined(defaults.ao_test_min, -10.0));
+  setInputValue('ao_test_max', firstDefined(defaults.ao_test_max, 10.0));
+  setInputValue('lock_target_mode', firstDefined(defaults.lock_target_mode, 'fixed'));
+  setInputValue('lock_ratio_sample_peak', firstDefined(defaults.lock_ratio_sample_peak, 'A'));
+  setInputValue('lock_ratio_metric', firstDefined(defaults.lock_ratio_metric, 'area'));
+  setInputValue('lock_follow_ratio', firstDefined(defaults.lock_follow_ratio, 1.0));
+  setInputValue('lock_update_s', firstDefined(defaults.lock_update_s, 1.0));
+  setInputValue('lock_eom_enabled', firstDefined(defaults.lock_eom_enabled, true));
+  setInputValue('lock_eom_channel', firstDefined(defaults.lock_eom_channel, 'ao0'));
+  setInputValue('lock_eom_feedback', firstDefined(defaults.lock_eom_feedback, 'area_ema'));
+  setInputValue('lock_eom_target', firstDefined(defaults.lock_eom_target, 4.7));
+  setInputValue('lock_eom_initial', firstDefined(defaults.lock_eom_initial, 2.0));
+  setInputValue('lock_eom_min', firstDefined(defaults.lock_eom_min, 1.0));
+  setInputValue('lock_eom_max', firstDefined(defaults.lock_eom_max, 3.5));
+  setInputValue('lock_eom_direction', firstDefined(defaults.lock_eom_direction, -1));
+  setInputValue('lock_eom_max_step', firstDefined(defaults.lock_eom_max_step, 0.01));
+  setInputValue('lock_eom_kp', firstDefined(defaults.lock_eom_kp, 0));
+  setInputValue('lock_eom_ki', firstDefined(defaults.lock_eom_ki, 0));
+  setInputValue('lock_aom_enabled', firstDefined(defaults.lock_aom_enabled, true));
+  setInputValue('lock_aom_channel', firstDefined(defaults.lock_aom_channel, 'ao1'));
+  setInputValue('lock_aom_feedback', firstDefined(defaults.lock_aom_feedback, 'area2_ema'));
+  setInputValue('lock_aom_target', firstDefined(defaults.lock_aom_target, 4.7));
+  setInputValue('lock_aom_initial', firstDefined(defaults.lock_aom_initial, 2.0));
+  setInputValue('lock_aom_min', firstDefined(defaults.lock_aom_min, 0.0));
+  setInputValue('lock_aom_max', firstDefined(defaults.lock_aom_max, 2.5));
+  setInputValue('lock_aom_direction', firstDefined(defaults.lock_aom_direction, 1));
+  setInputValue('lock_aom_max_step', firstDefined(defaults.lock_aom_max_step, 0.01));
+  setInputValue('lock_aom_kp', firstDefined(defaults.lock_aom_kp, 0));
+  setInputValue('lock_aom_ki', firstDefined(defaults.lock_aom_ki, 0));
+  updatePowerLockFormAvailability(false);
+  updateDerivedTimingFromInputs();
+  updateWindowVoltageEstimate();
+  applyXView(false);
+}
+
+function setStatus(text, kind) {
+  const el = document.getElementById('status');
+  el.textContent = text;
+  el.className = 'status' + (kind ? ' ' + kind : '');
+}
+
+async function postJson(path, body) {
+  const response = await fetch(path, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(body),
+  });
+  const data = await response.json();
+  if (!response.ok || data.ok === false) {
+    throw new Error(data.error || '请求失败');
+  }
+  return data;
+}
+
+async function loadDefaults() {
+  try {
+    const response = await fetch('/api/defaults');
+    const defaults = await response.json();
+    if (!response.ok || defaults.ok === false) {
+      throw new Error(defaults.error || '读取默认值失败');
+    }
+    applyDefaultsToUi(defaults);
+    const source = defaults.defaults_source === 'user' ? '用户默认值' : '出厂默认值';
+    setStatus(`已加载${source}。`, 'ok');
+  } catch (err) {
+    setStatus(String(err.message || err), 'error');
+  }
+}
+
+async function saveDefaults() {
+  try {
+    const defaults = await postJson('/api/defaults/save', {
+      parameters: getAllUiParameters(),
+    });
+    applyDefaultsToUi(defaults);
+    setStatus('当前参数已保存为默认值。', 'ok');
+  } catch (err) {
+    setStatus(String(err.message || err), 'error');
+  }
+}
+
+async function resetDefaults() {
+  try {
+    const defaults = await postJson('/api/defaults/reset', {});
+    applyDefaultsToUi(defaults);
+    setStatus('已恢复出厂默认值。', 'ok');
+  } catch (err) {
+    setStatus(String(err.message || err), 'error');
+  }
+}
+
+function formatNumber(value, digits = 3) {
+  if (value === null || value === undefined || Number.isNaN(Number(value))) return '--';
+  return Number(value).toFixed(digits);
+}
+
+function formatElapsedTime(totalSeconds) {
+  if (totalSeconds === null || totalSeconds === undefined || !Number.isFinite(Number(totalSeconds))) {
+    return '--';
+  }
+  const seconds = Math.max(0, Math.floor(Number(totalSeconds)));
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const rest = seconds % 60;
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(rest).padStart(2, '0')}`;
+}
+
+function updateDerivedTimingFromInputs() {
+  const rate = Number(document.getElementById('rate').value);
+  const samples = Number(document.getElementById('samples').value);
+  if (rate > 0 && samples > 0) {
+    document.getElementById('frame_duration_ms').value = formatNumber(samples / rate * 1000.0, 3);
+    document.getElementById('frame_rate_hz').value = formatNumber(rate / samples, 3);
+  } else {
+    document.getElementById('frame_duration_ms').value = '--';
+    document.getElementById('frame_rate_hz').value = '--';
+  }
+}
+
+function updateStreamStatus(status) {
+  const running = Boolean(status && status.running);
+  const frameId = status && status.frame_id !== undefined ? status.frame_id : streamLastFrameId;
+  const error = status && status.error ? `错误：${status.error}` : '';
+  const source = status && status.stream_source ? status.stream_source : document.getElementById('stream_source').value;
+  if (status && status.stream_source) {
+    document.getElementById('stream_source').value = status.stream_source;
+  }
+  document.getElementById('stream_status').value = error || (running ? `运行中 / ${source}` : `停止 / ${source}`);
+  document.getElementById('stream_frame_id').value = frameId || 0;
+  if (status && status.frame_duration_ms !== null && status.frame_duration_ms !== undefined) {
+    document.getElementById('frame_duration_ms').value = formatNumber(status.frame_duration_ms, 3);
+  }
+  if (status && status.frame_rate_hz !== null && status.frame_rate_hz !== undefined) {
+    document.getElementById('frame_rate_hz').value = formatNumber(status.frame_rate_hz, 3);
+  }
+}
+
+async function captureFrame() {
+  const btn = document.getElementById('captureBtn');
+  const streamStartBtn = document.getElementById('streamStartBtn');
+  btn.disabled = true;
+  streamStartBtn.disabled = true;
+  const params = getCaptureParams();
+  setStatus('正在从统一 AI 流抓取最新一帧...', '');
+  try {
+    const selectedChannels = encodeURIComponent(params.channels);
+    const response = await fetch(`/api/stream/latest?stream_source=unified_stream&channels=${selectedChannels}`);
+    latestFrame = await response.json();
+    if (!response.ok || latestFrame.ok === false) {
+      throw new Error(latestFrame.error || '抓取统一 AI 流最新帧失败');
+    }
+    latestMeasurement = null;
+    document.getElementById('saveBtn').disabled = false;
+    renderPlots();
+    updateFrameInfo();
+    await measurePeaks();
+    setStatus('已抓取统一 AI 流最新帧。', 'ok');
+  } catch (err) {
+    setStatus(String(err.message || err), 'error');
+  } finally {
+    btn.disabled = false;
+    streamStartBtn.disabled = false;
+  }
+}
+
+async function startBackendStream() {
+  if (streamRunning) return;
+  const params = getCaptureParams();
+  params.samples_per_frame = params.samples;
+  updateDerivedTimingFromInputs();
+  try {
+    const status = await postJson('/api/stream/start', params);
+    streamRunning = true;
+    streamLastFrameId = 0;
+    streamConsecutiveErrors = 0;
+    streamPollInFlight = false;
+    document.getElementById('streamStartBtn').disabled = true;
+    document.getElementById('streamStopBtn').disabled = false;
+    document.getElementById('captureBtn').disabled = true;
+    updateStreamStatus(status);
+    setStatus('连续采集已启动，等待最新帧...', 'ok');
+    streamTimer = setInterval(pollBackendStreamLatest, 80);
+  } catch (err) {
+    const message = String(err.message || err);
+    if (message.includes('AI frame stream is already running')) {
+      await syncBackendStreamStatus(true);
+    } else {
+      setStatus(message, 'error');
+      stopBackendStreamUiOnly();
+    }
+  }
+}
+
+async function stopBackendStream() {
+  try {
+    const status = await postJson('/api/stream/stop', {
+      stream_source: document.getElementById('stream_source').value,
+    });
+    updateStreamStatus(status);
+  } catch (err) {
+    setStatus(String(err.message || err), 'error');
+  } finally {
+    stopBackendStreamUiOnly();
+  }
+}
+
+function stopBackendStreamUiOnly() {
+  streamRunning = false;
+  streamPollInFlight = false;
+  if (streamTimer !== null) {
+    clearInterval(streamTimer);
+    streamTimer = null;
+  }
+  document.getElementById('streamStartBtn').disabled = false;
+  document.getElementById('streamStopBtn').disabled = true;
+  document.getElementById('captureBtn').disabled = false;
+  updateStreamStatus({running: false, frame_id: streamLastFrameId});
+}
+
+async function syncBackendStreamStatus(showStatus = false) {
+  try {
+    // 状态查询必须携带明确的数据源。否则 unified 流异常停止后，后端可能把页面
+    // 误切到兼容用的旧 frame_stream，下一次点击开始便会占用另一套 AI task。
+    const source = encodeURIComponent(document.getElementById('stream_source').value);
+    const response = await fetch(`/api/stream/status?stream_source=${source}`);
+    const status = await response.json();
+    if (!response.ok || status.ok === false) {
+      throw new Error(status.error || '查询连续采集状态失败');
+    }
+    updateStreamStatus(status);
+    streamLastFrameId = status.frame_id || 0;
+    streamRunning = Boolean(status.running);
+    document.getElementById('streamStartBtn').disabled = streamRunning;
+    document.getElementById('streamStopBtn').disabled = !streamRunning;
+    document.getElementById('captureBtn').disabled = streamRunning;
+    if (streamRunning && streamTimer === null) {
+      streamTimer = setInterval(pollBackendStreamLatest, 80);
+    }
+    if (!streamRunning && streamTimer !== null) {
+      clearInterval(streamTimer);
+      streamTimer = null;
+    }
+    if (showStatus && streamRunning) {
+      setStatus('检测到后端连续采集已经在运行，已接管状态。', 'ok');
+    }
+  } catch (err) {
+    if (showStatus) {
+      setStatus(String(err.message || err), 'error');
+    }
+  }
+}
+
+function updateTrendStatus(status) {
+  const running = Boolean(status && status.running);
+  const latest = status && status.latest_stats ? status.latest_stats : {};
+  trendRunning = running;
+  latestTrendStats = Object.keys(latest).length ? latest : null;
+  const error = status && status.error ? `错误：${status.error}` : '';
+  const stoppedByDuration = status && status.stop_reason === 'duration_elapsed';
+  const windowRevision = status && status.window_revision ? Number(status.window_revision) : 0;
+  document.getElementById('trend_status').value = error
+    || (running ? `记录中（边界 v${windowRevision}）` : (stoppedByDuration ? '已按设定时长结束' : '停止'));
+  const elapsedText = formatElapsedTime(status && status.elapsed_seconds);
+  const remainingText = formatElapsedTime(status && status.remaining_seconds);
+  document.getElementById('trend_time_status').value = running && remainingText !== '--'
+    ? `${elapsedText} / ${remainingText}`
+    : elapsedText;
+  document.getElementById('trend_records').value = status && status.records_written !== undefined
+    ? status.records_written
+    : 0;
+  document.getElementById('trend_file').value = status && status.csv_file ? status.csv_file : '';
+  const voltage = status && status.window_voltage ? status.window_voltage : {};
+  const voltageError = voltage.error ? `错误：${voltage.error}` : '';
+  document.getElementById('window_voltage_status').value = voltageError
+    || (voltage.running ? '写入中' : (voltage.enabled ? '已停止' : '关闭'));
+  document.getElementById('window_voltage_progress').value = voltage.enabled
+    ? `帧=${voltage.frames_written || 0}  块=${voltage.chunks_written || 0}`
+      + `  源漏帧=${voltage.source_gap_frames || 0}`
+      + `  队列丢帧=${voltage.queue_dropped_frames || 0}`
+      + `  文件=${formatBytes(voltage.bytes_written || 0)}`
+    : '--';
+  document.getElementById('window_voltage_directory').value = voltage.directory || '';
+
+  if (latest.area_sum_mean !== undefined) {
+    const rel = latest.area_sum_rel_std_percent === null || latest.area_sum_rel_std_percent === undefined
+      ? '--'
+      : `${formatNumber(latest.area_sum_rel_std_percent, 3)}%`;
+    const shot = latest.area_sum_shot2shot_rel_std_percent === null || latest.area_sum_shot2shot_rel_std_percent === undefined
+      ? '--'
+      : `${formatNumber(latest.area_sum_shot2shot_rel_std_percent, 3)}%`;
+    const emaText = latest.area_sum_ema === null || latest.area_sum_ema === undefined
+      ? 'EMA=--'
+      : `EMA=${Number(latest.area_sum_ema).toExponential(6)}`;
+    const areaAText = latest.area_ema === null || latest.area_ema === undefined
+      ? 'A=--'
+      : `A=${Number(latest.area_ema).toExponential(6)}`;
+    const areaBText = latest.area2_ema === null || latest.area2_ema === undefined
+      ? 'B=--'
+      : `B=${Number(latest.area2_ema).toExponential(6)}`;
+    document.getElementById('trend_latest').value =
+      `SUM=${Number(latest.area_sum_mean).toExponential(6)}  ${emaText}  ${areaAText}  ${areaBText}  std=${rel}  shot=${shot}`;
+  } else {
+    document.getElementById('trend_latest').value = '--';
+  }
+  drawAreaTrend(status && Array.isArray(status.recent_stats) ? status.recent_stats : []);
+  drawPeakHeightTrend(status && Array.isArray(status.recent_stats) ? status.recent_stats : []);
+  drawTopTrend(status && Array.isArray(status.recent_stats) ? status.recent_stats : []);
+  updateManualAreaTable();
+  updateDualAreaTable();
+  updateDualPeakHeightTable();
+  updateDualTopTable();
+  renderPlots();
+
+  document.getElementById('trendStartBtn').disabled = running;
+  document.getElementById('trendApplyWindowsBtn').disabled = !running;
+  document.getElementById('trendStopBtn').disabled = !running;
+  if (running && trendTimer === null) {
+    trendTimer = setInterval(() => refreshTrendStatus(false), 1000);
+  }
+  if (!running && trendTimer !== null) {
+    clearInterval(trendTimer);
+    trendTimer = null;
+  }
+}
+
+function drawAreaTrend(rows) {
+  drawTrendChart({
+    canvasId: 'areaTrendCanvas',
+    rows,
+    requiredField: 'area_sum_mean',
+    waitText: '等待面积记录...',
+    series: [
+      {field: 'area_sum_mean', label: 'SUM raw', color: '#2563eb'},
+      {field: 'area_sum_ema', label: 'SUM EMA', color: '#dc2626'},
+    ],
+  });
+}
+
+function formatBytes(value) {
+  const bytes = Number(value);
+  if (!Number.isFinite(bytes) || bytes <= 0) return '0 B';
+  if (bytes < 1024) return `${bytes.toFixed(0)} B`;
+  if (bytes < 1024 ** 2) return `${(bytes / 1024).toFixed(2)} KiB`;
+  if (bytes < 1024 ** 3) return `${(bytes / 1024 ** 2).toFixed(2)} MiB`;
+  return `${(bytes / 1024 ** 3).toFixed(2)} GiB`;
+}
+
+function updateWindowVoltageEstimate() {
+  const mode = document.getElementById('window_voltage_mode').value;
+  const recordFullFrame = document.getElementById('record_full_frame').checked;
+  if (mode === 'none' && !recordFullFrame) {
+    document.getElementById('window_voltage_estimate').value = '--';
+    return;
+  }
+  const rate = Number(document.getElementById('rate').value);
+  const samples = Number(document.getElementById('samples').value);
+  const frameRate = rate > 0 && samples > 0 ? rate / samples : 0;
+  const leftA = document.getElementById('manual_area_left').value;
+  const rightA = document.getElementById('manual_area_right').value;
+  const leftB = document.getElementById('manual_area2_left').value;
+  const rightB = document.getElementById('manual_area2_right').value;
+  const widthA = leftA === '' || rightA === '' ? NaN : Math.abs(Number(rightA) - Number(leftA)) + 1;
+  const widthB = leftB === '' || rightB === '' ? NaN : Math.abs(Number(rightB) - Number(leftB)) + 1;
+  let pointsPerFrame = 0;
+  if (mode === 'a' || mode === 'both') pointsPerFrame += Number.isFinite(widthA) ? widthA : 0;
+  if (mode === 'b' || mode === 'both') pointsPerFrame += Number.isFinite(widthB) ? widthB : 0;
+  if (recordFullFrame) pointsPerFrame += Number.isFinite(samples) ? samples : 0;
+  const bytesPerSecond = frameRate * pointsPerFrame * 4;
+  document.getElementById('window_voltage_estimate').value =
+    `${formatBytes(bytesPerSecond)}/s，约 ${formatBytes(bytesPerSecond * 3600)}/h`;
+}
+
+function drawPeakHeightTrend(rows) {
+  drawTrendChart({
+    canvasId: 'peakHeightTrendCanvas',
+    rows,
+    requiredField: 'peak_height_mean',
+    waitText: '等待峰高记录...',
+    series: [
+      {field: 'peak_height_mean', label: 'A raw', color: '#2563eb'},
+      {field: 'peak_height_ema', label: 'A EMA', color: '#dc2626'},
+      {field: 'peak2_height_mean', label: 'B raw', color: '#16803c'},
+      {field: 'peak2_height_ema', label: 'B EMA', color: '#7c3aed'},
+    ],
+  });
+}
+
+function drawTopTrend(rows) {
+  drawTrendChart({
+    canvasId: 'topTrendCanvas',
+    rows,
+    requiredField: 'top_mean',
+    waitText: '等待峰顶百分比记录...',
+    series: [
+      {field: 'top_mean', label: 'A Top mean', color: '#2563eb'},
+      {field: 'top_ema', label: 'A Top EMA', color: '#dc2626'},
+      {field: 'top2_mean', label: 'B Top mean', color: '#16803c'},
+      {field: 'top2_ema', label: 'B Top EMA', color: '#7c3aed'},
+    ],
+  });
+}
+
+function drawTrendChart({canvasId, rows, requiredField, waitText, series}) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const rect = canvas.getBoundingClientRect();
+  const devicePixelRatio = window.devicePixelRatio || 1;
+  canvas.width = Math.max(1, Math.floor(rect.width * devicePixelRatio));
+  canvas.height = Math.max(1, Math.floor(rect.height * devicePixelRatio));
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const points = (rows || [])
+    .filter(row => row[requiredField] !== null && row[requiredField] !== undefined)
+    .slice(-300);
+  if (points.length < 2) {
+    ctx.fillStyle = '#6b7280';
+    ctx.font = `${12 * devicePixelRatio}px Segoe UI`;
+    ctx.fillText(waitText, 10 * devicePixelRatio, 24 * devicePixelRatio);
+    return;
+  }
+
+  const preparedSeries = series.map(item => ({
+    ...item,
+    values: points.map(row => row[item.field] === null || row[item.field] === undefined
+      ? NaN
+      : Number(row[item.field])),
+  }));
+  const allValues = preparedSeries
+    .flatMap(item => item.values)
+    .filter(value => Number.isFinite(value));
+  if (!allValues.length) return;
+  let min = Math.min(...allValues);
+  let max = Math.max(...allValues);
+  if (!Number.isFinite(min) || !Number.isFinite(max)) return;
+  if (max === min) {
+    max += 1;
+    min -= 1;
+  }
+
+  const padL = 42 * devicePixelRatio;
+  const padR = 10 * devicePixelRatio;
+  const padT = 16 * devicePixelRatio;
+  const padB = 24 * devicePixelRatio;
+  const plotW = canvas.width - padL - padR;
+  const plotH = canvas.height - padT - padB;
+  const xFor = index => padL + (index / Math.max(1, points.length - 1)) * plotW;
+  const yFor = value => padT + (1 - (value - min) / (max - min)) * plotH;
+
+  ctx.strokeStyle = '#d1d5db';
+  ctx.lineWidth = 1 * devicePixelRatio;
+  ctx.strokeRect(padL, padT, plotW, plotH);
+  ctx.fillStyle = '#6b7280';
+  ctx.font = `${10 * devicePixelRatio}px Segoe UI`;
+  ctx.fillText(max.toExponential(2), 4 * devicePixelRatio, padT + 8 * devicePixelRatio);
+  ctx.fillText(min.toExponential(2), 4 * devicePixelRatio, padT + plotH);
+
+  let legendX = padL;
+  preparedSeries.forEach(item => {
+    drawTrendLine(ctx, item.values, xFor, yFor, item.color, devicePixelRatio);
+    ctx.fillStyle = item.color;
+    ctx.fillText(item.label, legendX, canvas.height - 8 * devicePixelRatio);
+    legendX += ctx.measureText(item.label).width + 18 * devicePixelRatio;
+  });
+}
+
+function drawTrendLine(ctx, values, xFor, yFor, color, devicePixelRatio) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.4 * devicePixelRatio;
+  ctx.beginPath();
+  let started = false;
+  values.forEach((value, index) => {
+    if (!Number.isFinite(value)) return;
+    const x = xFor(index);
+    const y = yFor(value);
+    if (!started) {
+      ctx.moveTo(x, y);
+      started = true;
+    } else {
+      ctx.lineTo(x, y);
+    }
+  });
+  if (started) ctx.stroke();
+}
+
+async function refreshTrendStatus(showStatus = false) {
+  try {
+    const response = await fetch('/api/trend/status');
+    const status = await response.json();
+    if (!response.ok || status.ok === false) {
+      throw new Error(status.error || '查询慢漂记录状态失败');
+    }
+    updateTrendStatus(status);
+    if (showStatus && status.running) {
+      setStatus('检测到慢漂记录正在运行，已接管状态。', 'ok');
+    }
+  } catch (err) {
+    if (showStatus) {
+      setStatus(String(err.message || err), 'error');
+    }
+  }
+}
+
+async function startAreaTrend() {
+  const params = {
+    ...getCaptureParams(),
+    ...getTrendParams(),
+  };
+  if (params.area_left === '' || params.area_right === '') {
+    setStatus('请先设置手动面积的左右零点。', 'error');
+    return;
+  }
+  if ((params.area2_left === '') !== (params.area2_right === '')) {
+    setStatus('面积 B 的左右零点需要同时设置，或者同时留空。', 'error');
+    return;
+  }
+  if (!Number.isFinite(params.ema_alpha) || params.ema_alpha < 0 || params.ema_alpha > 1) {
+    setStatus('EMA alpha 需要在 0 到 1 之间。', 'error');
+    return;
+  }
+  if (!Number.isFinite(params.top_percent) || params.top_percent <= 0 || params.top_percent > 100) {
+    setStatus('峰顶统计比例必须大于 0%，并且不能超过 100%。', 'error');
+    return;
+  }
+  if (!Number.isFinite(params.duration_minutes) || params.duration_minutes < 0) {
+    setStatus('自动停止时长必须 >= 0 分钟；0 表示不限时。', 'error');
+    return;
+  }
+  if (!Number.isFinite(params.auto_track_smooth_window) || params.auto_track_smooth_window < 1) {
+    setStatus('跟随平滑窗口必须 >= 1。', 'error');
+    return;
+  }
+  if (!Number.isFinite(params.auto_track_max_shift) || params.auto_track_max_shift < 0) {
+    setStatus('每帧最大移动必须 >= 0。', 'error');
+    return;
+  }
+  if (!streamRunning) {
+    setStatus('请先启动后端连续采集，再开始慢漂记录。', 'error');
+    return;
+  }
+  try {
+    const status = await postJson('/api/trend/start', params);
+    updateTrendStatus(status);
+    const durationText = params.duration_minutes > 0
+      ? `，将在 ${params.duration_minutes} 分钟后自动停止`
+      : '，当前未设置自动停止';
+    setStatus(`慢漂记录已启动，正在写入 CSV${durationText}。`, 'ok');
+  } catch (err) {
+    setStatus(String(err.message || err), 'error');
+    await refreshTrendStatus(false);
+  }
+}
+
+async function stopAreaTrend() {
+  try {
+    const status = await postJson('/api/trend/stop', {});
+    updateTrendStatus(status);
+    setStatus('慢漂记录已停止。', 'ok');
+  } catch (err) {
+    setStatus(String(err.message || err), 'error');
+  }
+}
+
+async function applyRunningAreaWindows() {
+  const params = getTrendParams();
+  if (params.area_left === '' || params.area_right === '') {
+    setStatus('窗口 A 的左右边界必须同时填写。', 'error');
+    return;
+  }
+  if ((params.area2_left === '') !== (params.area2_right === '')) {
+    setStatus('窗口 B 的左右边界必须同时填写，或者同时留空。', 'error');
+    return;
+  }
+  try {
+    const status = await postJson('/api/trend/update_windows', {
+      area_left: params.area_left,
+      area_right: params.area_right,
+      area2_left: params.area2_left,
+      area2_right: params.area2_right,
+    });
+    updateTrendStatus(status);
+    setStatus(`新面积边界已提交，将从下一帧生效：v${status.window_revision}`, 'ok');
+  } catch (err) {
+    setStatus(String(err.message || err), 'error');
+    await refreshTrendStatus(false);
+  }
+}
+
+function updateAoScanStatus(status) {
+  const running = Boolean(status && status.running);
+  const error = status && status.error ? status.error : '';
+  const points = status && Array.isArray(status.points) ? status.points : [];
+  const latest = points.length ? points[points.length - 1] : null;
+
+  document.getElementById('ao_scan_status').value = error || (running ? '扫描中' : '停止');
+  document.getElementById('ao_scan_points').value = status && status.points_written !== undefined
+    ? String(status.points_written)
+    : String(points.length);
+  document.getElementById('ao_scan_file').value = status && status.csv_file ? status.csv_file : '';
+  const latestValueText = latest && latest.area_value_mean !== null && latest.area_value_mean !== undefined
+    ? Number(latest.area_value_mean).toExponential(6)
+    : '--';
+  document.getElementById('ao_scan_latest').value = latest
+    ? `V=${formatNumber(latest.ao_voltage, 4)}  area=${latestValueText}  n=${latest.sample_count}`
+    : '--';
+
+  drawAoScan(points);
+  document.getElementById('aoScanStartBtn').disabled = running;
+  document.getElementById('aoScanStopBtn').disabled = !running;
+
+  if (running && aoScanTimer === null) {
+    aoScanTimer = setInterval(() => refreshAoScanStatus(false), 1000);
+  }
+  if (!running && aoScanTimer !== null) {
+    clearInterval(aoScanTimer);
+    aoScanTimer = null;
+  }
+}
+
+function drawAoScan(points) {
+  const canvas = document.getElementById('aoScanCanvas');
+  if (!canvas) return;
+  const rect = canvas.getBoundingClientRect();
+  const devicePixelRatio = window.devicePixelRatio || 1;
+  canvas.width = Math.max(1, Math.floor(rect.width * devicePixelRatio));
+  canvas.height = Math.max(1, Math.floor(rect.height * devicePixelRatio));
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const rows = (points || [])
+    .filter(point => point.ao_voltage !== undefined && point.area_value_mean !== undefined && point.area_value_mean !== null)
+    .map(point => ({
+      voltage: Number(point.ao_voltage),
+      value: Number(point.area_value_mean),
+    }))
+    .filter(point => Number.isFinite(point.voltage) && Number.isFinite(point.value));
+
+  if (rows.length < 2) {
+    ctx.fillStyle = '#6b7280';
+    ctx.font = `${12 * devicePixelRatio}px Segoe UI`;
+    ctx.fillText('等待 AO 扫描点...', 10 * devicePixelRatio, 24 * devicePixelRatio);
+    return;
+  }
+
+  let minX = Math.min(...rows.map(point => point.voltage));
+  let maxX = Math.max(...rows.map(point => point.voltage));
+  let minY = Math.min(...rows.map(point => point.value));
+  let maxY = Math.max(...rows.map(point => point.value));
+  if (maxX === minX) {
+    maxX += 1;
+    minX -= 1;
+  }
+  if (maxY === minY) {
+    maxY += 1;
+    minY -= 1;
+  }
+
+  const padL = 48 * devicePixelRatio;
+  const padR = 12 * devicePixelRatio;
+  const padT = 16 * devicePixelRatio;
+  const padB = 26 * devicePixelRatio;
+  const plotW = canvas.width - padL - padR;
+  const plotH = canvas.height - padT - padB;
+  const xFor = value => padL + ((value - minX) / (maxX - minX)) * plotW;
+  const yFor = value => padT + (1 - (value - minY) / (maxY - minY)) * plotH;
+
+  ctx.strokeStyle = '#d1d5db';
+  ctx.lineWidth = 1 * devicePixelRatio;
+  ctx.strokeRect(padL, padT, plotW, plotH);
+  ctx.fillStyle = '#6b7280';
+  ctx.font = `${10 * devicePixelRatio}px Segoe UI`;
+  ctx.fillText(maxY.toExponential(2), 4 * devicePixelRatio, padT + 8 * devicePixelRatio);
+  ctx.fillText(minY.toExponential(2), 4 * devicePixelRatio, padT + plotH);
+  ctx.fillText(`${formatNumber(minX, 3)} V`, padL, canvas.height - 8 * devicePixelRatio);
+  ctx.fillText(`${formatNumber(maxX, 3)} V`, padL + plotW - 42 * devicePixelRatio, canvas.height - 8 * devicePixelRatio);
+
+  ctx.strokeStyle = '#16833a';
+  ctx.lineWidth = 1.5 * devicePixelRatio;
+  ctx.beginPath();
+  rows.forEach((point, index) => {
+    const x = xFor(point.voltage);
+    const y = yFor(point.value);
+    if (index === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  ctx.fillStyle = '#16833a';
+  rows.forEach(point => {
+    const x = xFor(point.voltage);
+    const y = yFor(point.value);
+    ctx.beginPath();
+    ctx.arc(x, y, 2.5 * devicePixelRatio, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+async function refreshAoScanStatus(showStatus = false) {
+  try {
+    const response = await fetch('/api/ao_scan/status');
+    const status = await response.json();
+    if (!response.ok || status.ok === false) {
+      throw new Error(status.error || '查询 AO 扫描状态失败');
+    }
+    updateAoScanStatus(status);
+    if (showStatus && status.running) {
+      setStatus('检测到 AO 扫描正在运行，已接管状态。', 'ok');
+    }
+  } catch (err) {
+    if (showStatus) {
+      setStatus(String(err.message || err), 'error');
+    }
+  }
+}
+
+async function startAoScan() {
+  const params = getAoScanParams();
+  if (!params.channel.trim()) {
+    setStatus('请填写 AO 通道，例如 ao0。', 'error');
+    return;
+  }
+  if (!Number.isFinite(params.start_voltage) || !Number.isFinite(params.stop_voltage)) {
+    setStatus('AO 起始/终止电压必须是数字。', 'error');
+    return;
+  }
+  if (!Number.isFinite(params.step_voltage) || params.step_voltage === 0) {
+    setStatus('AO 步长必须是非零数字。', 'error');
+    return;
+  }
+  if (!Number.isFinite(params.min_val) || !Number.isFinite(params.max_val) || params.min_val >= params.max_val) {
+    setStatus('AO 最小值必须小于最大值。', 'error');
+    return;
+  }
+  if (!Number.isFinite(params.settle_s) || params.settle_s < 0) {
+    setStatus('改电压后等待时间必须 >= 0。', 'error');
+    return;
+  }
+  if (!Number.isFinite(params.dwell_s) || params.dwell_s <= 0) {
+    setStatus('每点测量时间必须 > 0。', 'error');
+    return;
+  }
+  if (params.restore_voltage !== '' && !Number.isFinite(Number(params.restore_voltage))) {
+    setStatus('结束恢复电压必须留空或填数字。', 'error');
+    return;
+  }
+
+  try {
+    const status = await postJson('/api/ao_scan/start', params);
+    updateAoScanStatus(status);
+    setStatus('AO 扫描标定已启动。请不要在扫描过程中手动改 AO 输出。', 'ok');
+  } catch (err) {
+    setStatus(String(err.message || err), 'error');
+    await refreshAoScanStatus(false);
+  }
+}
+
+async function stopAoScan() {
+  try {
+    const status = await postJson('/api/ao_scan/stop', {});
+    updateAoScanStatus(status);
+    setStatus('AO 扫描标定已停止。', 'ok');
+  } catch (err) {
+    setStatus(String(err.message || err), 'error');
+  }
+}
+
+function updateSyncTestStatus(status) {
+  const running = Boolean(status && status.running);
+  const armed = Boolean(status && status.power_armed);
+  const probeError = status && status.power_probe_error ? status.power_probe_error : '';
+  const syncError = status && status.error ? status.error : '';
+  document.getElementById('sync_power_armed').value = probeError
+    ? `连接失败：${probeError}`
+    : (status && status.power_running ? '功率记录中' : (armed ? '已预备' : '未预备'));
+  document.getElementById('sync_status').value = syncError
+    ? `错误：${syncError}`
+    : (running ? '同步记录中' : '停止');
+  document.getElementById('sync_session_id').value = status && status.session_id
+    ? status.session_id
+    : '';
+  document.getElementById('sync_manifest_file').value = status && status.manifest_file
+    ? status.manifest_file
+    : '';
+  document.getElementById('syncStartBtn').disabled = running || !armed || Boolean(probeError);
+  document.getElementById('syncStopBtn').disabled = !running;
+}
+
+async function refreshSyncTestStatus(showError = false) {
+  const powerUrl = encodeURIComponent(document.getElementById('sync_power_api_url').value);
+  try {
+    const response = await fetch(`/api/test_sync/status?power_api_url=${powerUrl}`);
+    const status = await response.json();
+    if (!response.ok || status.ok === false) {
+      throw new Error(status.error || '查询同步测试状态失败');
+    }
+    updateSyncTestStatus(status);
+  } catch (err) {
+    if (showError) setStatus(String(err.message || err), 'error');
+  }
+}
+
+async function startSyncTest() {
+  const params = {
+    ...getCaptureParams(),
+    ...getTrendParams(),
+    ...getSyncTestParams(),
+  };
+  if (!streamRunning) {
+    setStatus('请先接管正在运行的统一 AI 流。', 'error');
+    return;
+  }
+  if (params.window_voltage_mode === 'none' && !params.record_full_frame) {
+    setStatus('同步测试必须选择动态窗口记录或完整分析通道记录。', 'error');
+    return;
+  }
+  if (params.area_left === '' || params.area_right === '') {
+    setStatus('请先设置窗口 A 的左右边界。', 'error');
+    return;
+  }
+  if ((params.window_voltage_mode === 'b' || params.window_voltage_mode === 'both')
+      && (params.area2_left === '' || params.area2_right === '')) {
+    setStatus('记录窗口 B 时必须先设置 B 的左右边界。', 'error');
+    return;
+  }
+  try {
+    const status = await postJson('/api/test_sync/start', params);
+    updateSyncTestStatus(status);
+    await refreshTrendStatus(false);
+    setStatus(`同步测试已启动：${status.session_id}`, 'ok');
+  } catch (err) {
+    setStatus(String(err.message || err), 'error');
+    await refreshSyncTestStatus(false);
+    await refreshTrendStatus(false);
+  }
+}
+
+async function stopSyncTest() {
+  try {
+    const status = await postJson('/api/test_sync/stop', {});
+    updateSyncTestStatus(status);
+    await refreshTrendStatus(false);
+    setStatus('同步测试已停止，最后一个 NPZ 块已经刷新。', 'ok');
+  } catch (err) {
+    setStatus(String(err.message || err), 'error');
+  }
+}
+
+async function writeAoTest() {
+  const params = getAoTestParams();
+  if (!params.channel.trim()) {
+    setStatus('请填写单路 AO 诊断通道，例如 ao0。', 'error');
+    return;
+  }
+  if (!Number.isFinite(params.value)) {
+    setStatus('单路 AO 诊断电压必须是数字。', 'error');
+    return;
+  }
+  if (!Number.isFinite(params.min_val) || !Number.isFinite(params.max_val) || params.min_val >= params.max_val) {
+    setStatus('单路 AO 诊断的最小值必须小于最大值。', 'error');
+    return;
+  }
+  if (params.value < params.min_val || params.value > params.max_val) {
+    setStatus('单路 AO 诊断电压必须在安全范围内。', 'error');
+    return;
+  }
+  try {
+    const result = await postJson('/api/ao_test/write', params);
+    const returned = result.result || {};
+    setStatus(
+      `单路 AO 已写入：${returned.channel || result.channel} = ${formatNumber(returned.value ?? result.value, 5)} V`,
+      'ok'
+    );
+  } catch (err) {
+    setStatus(String(err.message || err), 'error');
+  }
+}
+
+const ratioMetricFields = {
+  area: {A: 'area_ema', B: 'area2_ema'},
+  top: {A: 'top_ema', B: 'top2_ema'},
+  peak_height: {A: 'peak_height_ema', B: 'peak2_height_ema'},
+};
+
+function buildFixedPowerLockController(params, route) {
+  const prefix = route === 'EOM' ? 'lock_eom' : 'lock_aom';
+  const isEom = route === 'EOM';
+  return {
+    name: route,
+    role: isEom ? 'area_a' : 'area_b',
+    channel: params[`${prefix}_channel`],
+    feedback_field: params[`${prefix}_feedback`],
+    target_mode: 'fixed',
+    reference_field: '',
+    follow_ratio: 1.0,
+    target: params[`${prefix}_target`],
+    initial_voltage: params[`${prefix}_initial`],
+    min_voltage: params[`${prefix}_min`],
+    max_voltage: params[`${prefix}_max`],
+    direction: params[`${prefix}_direction`],
+    max_step_v: params[`${prefix}_max_step`],
+    kp: params[`${prefix}_kp`],
+    ki: params[`${prefix}_ki`],
+    enabled: params[`${prefix}_enabled`],
+  };
+}
+
+function buildPowerLockControllers() {
+  const params = getPowerLockParams();
+  if (params.lock_target_mode !== 'follow_ratio') {
+    return [
+      buildFixedPowerLockController(params, 'EOM'),
+      buildFixedPowerLockController(params, 'AOM'),
+    ];
+  }
+
+  const samplePeak = params.lock_ratio_sample_peak;
+  const lockPeak = samplePeak === 'A' ? 'B' : 'A';
+  const fields = ratioMetricFields[params.lock_ratio_metric];
+  if (!fields) {
+    throw new Error('未知的峰比值统计指标。');
+  }
+
+  // 当前硬件映射沿用已有约定：窗口 A 由 EOM/ao0 路控制，窗口 B 由
+  // AOM/ao1 路控制。比例模式只返回锁定峰对应的一路控制器，因此采样峰
+  // 从软件结构上就没有 AO 写入机会。
+  const route = lockPeak === 'A' ? 'EOM' : 'AOM';
+  const controller = buildFixedPowerLockController(params, route);
+  controller.enabled = true;
+  controller.target_mode = 'follow_ratio';
+  controller.feedback_field = fields[lockPeak];
+  controller.reference_field = fields[samplePeak];
+  controller.follow_ratio = params.lock_follow_ratio;
+  controller.role = lockPeak === 'A' ? 'area_a' : 'area_b';
+  return [controller];
+}
+
+function validatePowerLockController(controller) {
+  if (!controller.enabled) return;
+  if (!controller.channel.trim()) {
+    throw new Error(`${controller.name} AO 通道不能为空。`);
+  }
+  for (const key of ['target', 'follow_ratio', 'initial_voltage', 'min_voltage', 'max_voltage', 'direction', 'max_step_v', 'kp', 'ki']) {
+    if (!Number.isFinite(Number(controller[key]))) {
+      throw new Error(`${controller.name} 的 ${key} 必须是数字。`);
+    }
+  }
+  if (controller.min_voltage >= controller.max_voltage) {
+    throw new Error(`${controller.name} 最小电压必须小于最大电压。`);
+  }
+  if (controller.initial_voltage < controller.min_voltage || controller.initial_voltage > controller.max_voltage) {
+    throw new Error(`${controller.name} 初始电压必须在安全范围内。`);
+  }
+  if (controller.max_step_v < 0) {
+    throw new Error(`${controller.name} 单步限幅必须 >= 0。`);
+  }
+  if (![1, -1].includes(Number(controller.direction))) {
+    throw new Error(`${controller.name} 控制方向只能是 +1 或 -1。`);
+  }
+  if (controller.target_mode === 'follow_ratio' && controller.follow_ratio <= 0) {
+    throw new Error('锁定峰 / 采样峰的目标比值必须 > 0。');
+  }
+}
+
+function trendValueWithFallback(stats, field) {
+  const fallbackFields = {
+    area_ema: 'area_mean',
+    area2_ema: 'area2_mean',
+    top_ema: 'top_mean',
+    top2_ema: 'top2_mean',
+    peak_height_ema: 'peak_height_mean',
+    peak2_height_ema: 'peak2_height_mean',
+  };
+  const direct = stats ? stats[field] : null;
+  if (direct !== null && direct !== undefined) return Number(direct);
+  const fallback = fallbackFields[field];
+  return fallback && stats && stats[fallback] !== null && stats[fallback] !== undefined
+    ? Number(stats[fallback])
+    : NaN;
+}
+
+function useCurrentPeakRatio() {
+  try {
+    const params = getPowerLockParams();
+    const fields = ratioMetricFields[params.lock_ratio_metric];
+    const samplePeak = params.lock_ratio_sample_peak;
+    const lockPeak = samplePeak === 'A' ? 'B' : 'A';
+    const sampleValue = trendValueWithFallback(latestTrendStats, fields[samplePeak]);
+    const lockValue = trendValueWithFallback(latestTrendStats, fields[lockPeak]);
+    if (!Number.isFinite(sampleValue) || sampleValue <= 1e-12 || !Number.isFinite(lockValue)) {
+      throw new Error('当前还没有有效的双峰慢漂统计，不能计算峰比值。');
+    }
+    const ratio = lockValue / sampleValue;
+    document.getElementById('lock_follow_ratio').value = String(ratio);
+    setStatus(`已取当前峰比值：${formatNumber(ratio, 6)}`, 'ok');
+  } catch (err) {
+    setStatus(String(err.message || err), 'error');
+  }
+}
+
+function updatePowerLockFormAvailability(running) {
+  const ratioMode = document.getElementById('lock_target_mode').value === 'follow_ratio';
+  const samplePeak = document.getElementById('lock_ratio_sample_peak').value;
+  const lockRoute = samplePeak === 'A' ? 'aom' : 'eom';
+  const lockPeak = samplePeak === 'A' ? 'B' : 'A';
+  document.getElementById('ratio_lock_settings').style.display = ratioMode ? 'block' : 'none';
+  document.getElementById('lock_ratio_lock_peak').value = lockPeak === 'A'
+    ? '窗口 A / EOM 路'
+    : '窗口 B / AOM 路';
+  document.getElementById('fixed_lock_enable_controls').style.display = ratioMode ? 'none' : 'grid';
+  ['eom', 'aom'].forEach(route => {
+    document.getElementById(`lock_${route}_fixed_feedback`).style.display = ratioMode ? 'none' : 'block';
+    document.getElementById(`lock_${route}_fixed_target`).style.display = ratioMode ? 'none' : 'block';
+  });
+
+  // 模式、峰角色和统计口径会改变控制回路的物理定义，锁定运行中不能修改。
+  document.getElementById('lock_target_mode').disabled = running;
+  document.getElementById('lock_ratio_sample_peak').disabled = running;
+  document.getElementById('lock_ratio_metric').disabled = running;
+  document.getElementById('lock_follow_ratio').disabled = !ratioMode;
+
+  ['eom', 'aom'].forEach(route => {
+    const routeIsUsed = !ratioMode || route === lockRoute;
+    document.getElementById(`lock_${route}_enabled`).disabled = running || ratioMode;
+    document.getElementById(`lock_${route}_feedback`).disabled = running || ratioMode;
+    document.getElementById(`lock_${route}_target`).disabled = ratioMode;
+    ['channel', 'initial', 'min', 'max', 'direction'].forEach(field => {
+      document.getElementById(`lock_${route}_${field}`).disabled = running || !routeIsUsed;
+    });
+    ['max_step', 'kp', 'ki'].forEach(field => {
+      document.getElementById(`lock_${route}_${field}`).disabled = !routeIsUsed;
+    });
+  });
+}
+
+async function writePowerLockInitialAo() {
+  try {
+    const controllers = buildPowerLockControllers();
+    controllers.forEach(validatePowerLockController);
+    const updateS = Number(document.getElementById('lock_update_s').value);
+    if (!Number.isFinite(updateS) || updateS <= 0) {
+      throw new Error('锁定更新周期必须 > 0。');
+    }
+    const result = await postJson('/api/power_lock/write_initial_ao', {controllers});
+    const text = result.written
+      .map(item => {
+        const returned = item.result || {};
+        return `${item.name || item.channel}:${returned.channel || item.channel}=${formatNumber(returned.value ?? item.initial_voltage, 4)} V`;
+      })
+      .join('  ');
+    setStatus(`已写入初始 AO 电压：${text}`, 'ok');
+  } catch (err) {
+    setStatus(String(err.message || err), 'error');
+  }
+}
+
+function formatPowerLockState(state) {
+  if (!state) return '--';
+  const measured = state.measured === null || state.measured === undefined
+    ? '--'
+    : Number(state.measured).toExponential(5);
+  const errorPercent = state.relative_error === null || state.relative_error === undefined
+    ? '--'
+    : `${formatNumber(Number(state.relative_error) * 100, 3)}%`;
+  const voltage = state.voltage === null || state.voltage === undefined
+    ? '--'
+    : `${formatNumber(state.voltage, 5)} V`;
+  const limited = state.limited ? '  LIMIT' : '';
+  const ratioText = state.target_mode === 'follow_ratio'
+    ? `  ratio=${formatNumber(state.actual_ratio, 5)}/${formatNumber(state.follow_ratio, 5)}`
+    : '';
+  return `${state.feedback_field}=${measured}${ratioText}  err=${errorPercent}  AO=${voltage}${limited}`;
+}
+
+function syncPowerLockFormFromBackend(status) {
+  const revision = Number(status && status.parameter_revision) || 0;
+  if (!status || !status.running || revision === powerLockDisplayedRevision) return;
+
+  const controllers = Array.isArray(status.controllers) ? status.controllers : [];
+  const settings = status.settings || {};
+  const ratioController = controllers.find(item => item.target_mode === 'follow_ratio');
+  if (ratioController) {
+    setInputValue('lock_target_mode', 'follow_ratio');
+    const referenceField = ratioController.reference_field;
+    const samplePeak = ['area2_ema', 'top2_ema', 'peak2_height_ema'].includes(referenceField)
+      ? 'B'
+      : 'A';
+    const metric = referenceField.startsWith('area')
+      ? 'area'
+      : (referenceField.startsWith('top') ? 'top' : 'peak_height');
+    setInputValue('lock_ratio_sample_peak', samplePeak);
+    setInputValue('lock_ratio_metric', metric);
+    setInputValue('lock_follow_ratio', ratioController.follow_ratio);
+  } else {
+    setInputValue('lock_target_mode', 'fixed');
+  }
+  const routes = [
+    {name: 'EOM', prefix: 'lock_eom'},
+    {name: 'AOM', prefix: 'lock_aom'},
+  ];
+  routes.forEach(route => {
+    const controller = controllers.find(item => item.name === route.name);
+    if (!ratioController) {
+      setInputValue(`${route.prefix}_enabled`, Boolean(controller));
+    }
+    if (!controller) return;
+    setInputValue(`${route.prefix}_channel`, controller.channel);
+    if (!ratioController) {
+      setInputValue(`${route.prefix}_feedback`, controller.feedback_field);
+      setInputValue(`${route.prefix}_target`, controller.target);
+    }
+    setInputValue(`${route.prefix}_initial`, controller.initial_voltage);
+    setInputValue(`${route.prefix}_min`, controller.min_voltage);
+    setInputValue(`${route.prefix}_max`, controller.max_voltage);
+    setInputValue(`${route.prefix}_direction`, controller.direction);
+    setInputValue(`${route.prefix}_max_step`, controller.max_step_v);
+    setInputValue(`${route.prefix}_kp`, controller.kp);
+    setInputValue(`${route.prefix}_ki`, controller.ki);
+  });
+  setInputValue('lock_update_s', settings.update_s);
+  powerLockDisplayedRevision = revision;
+}
+
+function updatePowerLockStatus(status) {
+  const running = Boolean(status && status.running);
+  const error = status && status.error ? status.error : '';
+  const states = status && Array.isArray(status.states) ? status.states : [];
+  const eomState = states.find(state => state.name === 'EOM');
+  const aomState = states.find(state => state.name === 'AOM');
+  const ratioState = states.find(state => state.target_mode === 'follow_ratio');
+
+  const revision = status && status.parameter_revision ? Number(status.parameter_revision) : 0;
+  // 只在后端参数版本变化时同步一次。用户随后在输入框里准备的新参数，
+  // 不会被每秒一次的状态轮询反复覆盖。
+  syncPowerLockFormFromBackend(status);
+  document.getElementById('power_lock_status').value = error
+    || (running ? `锁定中（参数 v${revision}）` : '停止');
+  document.getElementById('power_lock_iterations').value = status && status.iterations !== undefined
+    ? String(status.iterations)
+    : '0';
+  document.getElementById('power_lock_eom_status').value = formatPowerLockState(eomState);
+  document.getElementById('power_lock_aom_status').value = formatPowerLockState(aomState);
+  document.getElementById('power_lock_ratio_status').value = ratioState
+    ? `sample=${formatNumber(ratioState.reference_value, 6)}  lock=${formatNumber(ratioState.measured, 6)}  target=${formatNumber(ratioState.target, 6)}  ratio=${formatNumber(ratioState.actual_ratio, 6)}/${formatNumber(ratioState.follow_ratio, 6)}`
+    : '--';
+  document.getElementById('power_lock_log_file').value = status && status.csv_file
+    ? status.csv_file
+    : '--';
+  document.getElementById('powerLockStartBtn').disabled = running;
+  document.getElementById('powerLockStopBtn').disabled = !running;
+  document.getElementById('powerLockApplyBtn').disabled = !running;
+  document.getElementById('powerLockWriteInitialBtn').disabled = running;
+
+  // 运行中继续开放比例/固定目标、Kp、Ki、单步限幅和检查周期；
+  // 会改变硬件身份或反馈口径的参数由统一函数锁定。
+  updatePowerLockFormAvailability(running);
+
+  if (running && powerLockTimer === null) {
+    powerLockTimer = setInterval(() => refreshPowerLockStatus(false), 1000);
+  }
+  if (!running && powerLockTimer !== null) {
+    clearInterval(powerLockTimer);
+    powerLockTimer = null;
+  }
+  if (!running) {
+    powerLockDisplayedRevision = 0;
+  }
+}
+
+async function refreshPowerLockStatus(showStatus = false) {
+  try {
+    const response = await fetch('/api/power_lock/status');
+    const status = await response.json();
+    if (!response.ok || status.ok === false) {
+      throw new Error(status.error || '查询功率锁定状态失败');
+    }
+    updatePowerLockStatus(status);
+    if (showStatus && status.running) {
+      setStatus('检测到功率锁定正在运行，已接管状态。', 'ok');
+    }
+  } catch (err) {
+    if (showStatus) {
+      setStatus(String(err.message || err), 'error');
+    }
+  }
+}
+
+async function startPowerLock() {
+  try {
+    const controllers = buildPowerLockControllers();
+    controllers.forEach(validatePowerLockController);
+    const updateS = Number(document.getElementById('lock_update_s').value);
+    if (!Number.isFinite(updateS) || updateS <= 0) {
+      throw new Error('锁定更新周期必须 > 0。');
+    }
+    const status = await postJson('/api/power_lock/start', {
+      controllers,
+      update_s: updateS,
+    });
+    updatePowerLockStatus(status);
+    const modeText = document.getElementById('lock_target_mode').value === 'follow_ratio'
+      ? '峰比值锁定'
+      : '固定目标锁定';
+    setStatus(`${modeText}已启动。`, 'ok');
+  } catch (err) {
+    setStatus(String(err.message || err), 'error');
+    await refreshPowerLockStatus(false);
+  }
+}
+
+async function applyPowerLockParameters() {
+  try {
+    const controllers = buildPowerLockControllers();
+    controllers.forEach(validatePowerLockController);
+    const updateS = Number(document.getElementById('lock_update_s').value);
+    if (!Number.isFinite(updateS) || updateS <= 0) {
+      throw new Error('锁定更新周期必须 > 0。');
+    }
+    const status = await postJson('/api/power_lock/update', {
+      controllers,
+      update_s: updateS,
+    });
+    updatePowerLockStatus(status);
+    setStatus(`运行中参数已应用：v${status.parameter_revision}`, 'ok');
+  } catch (err) {
+    setStatus(String(err.message || err), 'error');
+    await refreshPowerLockStatus(false);
+  }
+}
+
+async function stopPowerLock() {
+  try {
+    const status = await postJson('/api/power_lock/stop', {});
+    updatePowerLockStatus(status);
+    setStatus('功率锁定已停止，AO 保持最后输出。', 'ok');
+  } catch (err) {
+    setStatus(String(err.message || err), 'error');
+  }
+}
+
+async function pollBackendStreamLatest() {
+  if (!streamRunning) return;
+  if (streamPollInFlight) return;
+  streamPollInFlight = true;
+  try {
+    const selectedChannels = encodeURIComponent(document.getElementById('channels').value);
+    const response = await fetch(`/api/stream/latest?stream_source=unified_stream&channels=${selectedChannels}`);
+    const frame = await response.json();
+    if (!response.ok || frame.ok === false) {
+      const statusResponse = await fetch('/api/stream/status');
+      const status = await statusResponse.json();
+      if (status.error) {
+        throw new Error(status.error);
+      }
+      return;
+    }
+    if (frame.frame_id === streamLastFrameId) return;
+    streamConsecutiveErrors = 0;
+    streamLastFrameId = frame.frame_id;
+    latestFrame = frame;
+    latestMeasurement = null;
+    document.getElementById('saveBtn').disabled = false;
+    updateStreamStatus({
+      running: true,
+      frame_id: frame.frame_id,
+      frame_duration_ms: frame.frame_duration_ms,
+      frame_rate_hz: frame.frame_rate_hz,
+    });
+    renderPlots();
+    updateFrameInfo();
+    await measurePeaks();
+    setStatus(`连续采集中，最新帧 #${streamLastFrameId}。`, 'ok');
+  } catch (err) {
+    streamConsecutiveErrors += 1;
+    const message = String(err.message || err);
+    setStatus(`显示轮询暂时失败 ${streamConsecutiveErrors}/50：${message}`, 'error');
+    if (streamConsecutiveErrors >= 50) {
+      stopBackendStreamUiOnly();
+    }
+  } finally {
+    streamPollInFlight = false;
+  }
+}
+
+async function measurePeaks() {
+  if (!latestFrame) {
+    setStatus('还没有采集波形。', 'error');
+    return;
+  }
+  try {
+    latestMeasurement = await postJson('/api/measure', getMeasureParams());
+    updateDualAreaHistory();
+    updatePeakTable();
+    updateManualAreaTable();
+    updateDualAreaTable();
+    renderPlots();
+    setStatus('测峰完成。', 'ok');
+  } catch (err) {
+    setStatus(String(err.message || err), 'error');
+  }
+}
+
+async function saveFrame() {
+  if (!latestFrame) {
+    setStatus('还没有采集波形。', 'error');
+    return;
+  }
+  try {
+    const saved = await postJson('/api/save', {
+      parameters: getAllUiParameters(),
+    });
+    setStatus('样本已保存：' + saved.npy_file, 'ok');
+    await refreshSavedSamples();
+  } catch (err) {
+    setStatus(String(err.message || err), 'error');
+  }
+}
+
+async function refreshSavedSamples() {
+  try {
+    const response = await fetch('/api/samples');
+    const data = await response.json();
+    if (!response.ok || data.ok === false) {
+      throw new Error(data.error || '读取样本列表失败');
+    }
+    const select = document.getElementById('saved_samples');
+    select.innerHTML = '';
+    for (const item of data.samples || []) {
+      const option = document.createElement('option');
+      option.value = item.metadata_file;
+      const frame = item.frame || {};
+      const dateText = item.saved_at ? new Date(item.saved_at * 1000).toLocaleString() : item.metadata_file;
+      option.textContent = `${dateText}  ${frame.channels || ''}  ${frame.samples_per_channel || ''}点`;
+      select.appendChild(option);
+    }
+    if (!select.options.length) {
+      const option = document.createElement('option');
+      option.value = '';
+      option.textContent = '暂无已保存样本';
+      select.appendChild(option);
+    }
+  } catch (err) {
+    setStatus(String(err.message || err), 'error');
+  }
+}
+
+async function loadSavedSample() {
+  const metadataFile = document.getElementById('saved_samples').value;
+  if (!metadataFile) {
+    setStatus('没有可加载的样本。', 'error');
+    return;
+  }
+  if (streamRunning) {
+    await stopBackendStream();
+  }
+  try {
+    const loaded = await postJson('/api/load', {metadata_file: metadataFile});
+    latestFrame = loaded.frame;
+    latestMeasurement = loaded.measurement;
+    document.getElementById('saveBtn').disabled = false;
+    resetXView(false);
+    renderPlots();
+    updateFrameInfo();
+    updatePeakTable();
+    updateManualAreaTable();
+    updateDualAreaTable();
+    setStatus('历史样本已加载。', 'ok');
+  } catch (err) {
+    setStatus(String(err.message || err), 'error');
+  }
+}
+
+function clearPeaks() {
+  latestMeasurement = null;
+  manualAreaHistory = [];
+  manualArea2History = [];
+  updatePeakTable();
+  updateManualAreaTable();
+  updateDualAreaTable();
+  renderPlots();
+}
+
+function getVisibleRange(length) {
+  if (!length || length < 2) return {start: 0, end: 0};
+  let start = Number.isFinite(xViewStart) ? Math.round(xViewStart) : 0;
+  let end = Number.isFinite(xViewEnd) ? Math.round(xViewEnd) : length - 1;
+  start = Math.min(Math.max(start, 0), length - 1);
+  end = Math.min(Math.max(end, 0), length - 1);
+  if (end <= start) {
+    start = 0;
+    end = length - 1;
+  }
+  return {start, end};
+}
+
+function applyXView(showStatus = true) {
+  const startText = document.getElementById('x_start').value.trim();
+  const endText = document.getElementById('x_end').value.trim();
+  xViewStart = startText === '' ? null : Number(startText);
+  xViewEnd = endText === '' ? null : Number(endText);
+  renderPlots();
+  if (showStatus) {
+    setStatus('已应用横向视图范围。', 'ok');
+  }
+}
+
+function resetXView(showStatus = true) {
+  xViewStart = null;
+  xViewEnd = null;
+  document.getElementById('x_start').value = '';
+  document.getElementById('x_end').value = '';
+  renderPlots();
+  if (showStatus) {
+    setStatus('已显示全帧。', 'ok');
+  }
+}
+
+function renderPlots() {
+  const container = document.getElementById('plots');
+  container.innerHTML = '';
+  plotCanvases = [];
+  if (!latestFrame || !latestFrame.values) return;
+
+  const count = latestFrame.values.length;
+  if (count <= 2) {
+    container.style.gridTemplateRows = `repeat(${count}, minmax(0, 1fr))`;
+  } else {
+    container.style.gridTemplateRows = `repeat(${count}, minmax(220px, 1fr))`;
+  }
+
+  latestFrame.values.forEach((data, index) => {
+    const box = document.createElement('div');
+    box.className = 'plot';
+    const title = document.createElement('div');
+    title.className = 'plot-title';
+    title.textContent = `${latestFrame.channels[index]}  ${data.length} 点`;
+    const canvas = document.createElement('canvas');
+    canvas.addEventListener('click', event => handlePlotClick(event, index));
+    canvas.addEventListener('mousemove', event => updateCursor(event, index));
+    box.appendChild(title);
+    box.appendChild(canvas);
+    container.appendChild(box);
+    plotCanvases.push({canvas, data, index});
+  });
+
+  resizeAndDraw();
+}
+
+function resizeAndDraw() {
+  for (const item of plotCanvases) {
+    const rect = item.canvas.parentElement.getBoundingClientRect();
+    item.canvas.width = Math.max(300, Math.floor(rect.width * devicePixelRatio));
+    item.canvas.height = Math.max(180, Math.floor(rect.height * devicePixelRatio));
+    drawWaveform(item.canvas, item.data, item.index);
+  }
+}
+
+function drawWaveform(canvas, data, channelIndex) {
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width;
+  const h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, w, h);
+
+  if (!data || data.length < 2) return;
+  const range = getVisibleRange(data.length);
+  let min = data[range.start];
+  let max = data[range.start];
+  for (let i = range.start; i <= range.end; i += 1) {
+    const value = data[i];
+    if (value < min) min = value;
+    if (value > max) max = value;
+  }
+  const span = Math.max(1e-12, max - min);
+  const padX = 44 * devicePixelRatio;
+  const padY = 28 * devicePixelRatio;
+  const x0 = padX;
+  const y0 = padY;
+  const plotW = w - 2 * padX;
+  const plotH = h - 2 * padY;
+
+  ctx.strokeStyle = '#d7dde5';
+  ctx.lineWidth = 1 * devicePixelRatio;
+  ctx.strokeRect(x0, y0, plotW, plotH);
+
+  ctx.beginPath();
+  for (let i = range.start; i <= range.end; i += 1) {
+    const value = data[i];
+    const x = x0 + ((i - range.start) / Math.max(1, range.end - range.start)) * plotW;
+    const y = y0 + (1 - (value - min) / span) * plotH;
+    if (i === range.start) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = channelIndex === 0 ? '#1f6feb' : '#16833a';
+  ctx.lineWidth = 1.4 * devicePixelRatio;
+  ctx.stroke();
+
+  drawMarkers(ctx, data, channelIndex, x0, y0, plotW, plotH, min, span, range);
+
+  ctx.fillStyle = '#697586';
+  ctx.font = `${11 * devicePixelRatio}px Consolas`;
+  ctx.fillText(`min ${min.toFixed(5)} V`, x0, h - 8 * devicePixelRatio);
+  ctx.fillText(`max ${max.toFixed(5)} V`, x0 + 150 * devicePixelRatio, h - 8 * devicePixelRatio);
+  ctx.fillText(`x ${range.start}-${range.end}`, x0 + 300 * devicePixelRatio, h - 8 * devicePixelRatio);
+}
+
+function getActiveAreaStats() {
+  // 面积慢漂记录运行时，功率锁定实际读取的就是 latestTrendStats。
+  // 因此画线和表格也必须优先使用这份后端统计，不能再使用输入框里的旧窗口。
+  if (!trendRunning || !latestTrendStats) return null;
+  if (latestTrendStats.area_left === undefined || latestTrendStats.area_right === undefined) return null;
+  return latestTrendStats;
+}
+
+function getDisplayedAreaEdges() {
+  const stats = getActiveAreaStats();
+  if (stats) {
+    return [
+      {index: Number(stats.area_left), label: 'A-L', color: '#7c3aed'},
+      {index: Number(stats.area_right), label: 'A-R', color: '#7c3aed'},
+      {index: Number(stats.area2_left), label: 'B-L', color: '#16803c'},
+      {index: Number(stats.area2_right), label: 'B-R', color: '#16803c'},
+    ];
+  }
+  return [
+    {index: Number(document.getElementById('manual_area_left').value), label: 'A-L', color: '#7c3aed'},
+    {index: Number(document.getElementById('manual_area_right').value), label: 'A-R', color: '#7c3aed'},
+    {index: Number(document.getElementById('manual_area2_left').value), label: 'B-L', color: '#16803c'},
+    {index: Number(document.getElementById('manual_area2_right').value), label: 'B-R', color: '#16803c'},
+  ];
+}
+
+function drawMarkers(ctx, data, channelIndex, x0, y0, plotW, plotH, min, span, range) {
+  const analysisIndex = Number(document.getElementById('analysis_channel_index').value);
+  if (channelIndex !== analysisIndex) return;
+
+  const peaks = [
+    Number(document.getElementById('peak0').value),
+    Number(document.getElementById('peak1').value),
+  ];
+  peaks.forEach((idx, i) => {
+    if (!Number.isFinite(idx) || idx < range.start || idx > range.end) return;
+    const x = x0 + ((idx - range.start) / Math.max(1, range.end - range.start)) * plotW;
+    ctx.strokeStyle = i === 0 ? '#c62828' : '#9a6700';
+    ctx.lineWidth = 1.3 * devicePixelRatio;
+    ctx.beginPath();
+    ctx.moveTo(x, y0);
+    ctx.lineTo(x, y0 + plotH);
+    ctx.stroke();
+    ctx.fillStyle = i === 0 ? '#c62828' : '#9a6700';
+    ctx.font = `${12 * devicePixelRatio}px Segoe UI`;
+    ctx.fillText(i === 0 ? 'P1' : 'P2', x + 4 * devicePixelRatio, y0 + 16 * devicePixelRatio);
+  });
+
+  const areaEdges = getDisplayedAreaEdges();
+  areaEdges.forEach(edge => {
+    const idx = Number(edge.index);
+    if (!Number.isFinite(idx) || idx < range.start || idx > range.end) return;
+    const x = x0 + ((idx - range.start) / Math.max(1, range.end - range.start)) * plotW;
+    ctx.strokeStyle = edge.color;
+    ctx.lineWidth = 1.2 * devicePixelRatio;
+    ctx.beginPath();
+    ctx.moveTo(x, y0);
+    ctx.lineTo(x, y0 + plotH);
+    ctx.stroke();
+    ctx.fillStyle = edge.color;
+    ctx.font = `${12 * devicePixelRatio}px Segoe UI`;
+    ctx.fillText(edge.label, x + 4 * devicePixelRatio, y0 + 32 * devicePixelRatio);
+  });
+
+  if (latestMeasurement && latestMeasurement.measurements) {
+    latestMeasurement.measurements.forEach((m, i) => {
+      const idx = m.index;
+      if (idx < range.start || idx > range.end) return;
+      const x = x0 + ((idx - range.start) / Math.max(1, range.end - range.start)) * plotW;
+      const y = y0 + (1 - (data[idx] - min) / span) * plotH;
+      ctx.fillStyle = i === 0 ? '#c62828' : '#9a6700';
+      ctx.beginPath();
+      ctx.arc(x, y, 4 * devicePixelRatio, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+}
+
+function handlePlotClick(event, channelIndex) {
+  const analysisIndex = Number(document.getElementById('analysis_channel_index').value);
+  if (channelIndex !== analysisIndex || !latestFrame) return;
+  const item = plotCanvases[channelIndex];
+  const idx = eventToSampleIndex(event, item.canvas, item.data.length);
+  const target = document.getElementById('pick_target').value;
+  if (target === 'area_left') {
+    document.getElementById('manual_area_left').value = idx;
+    document.getElementById('pick_target').value = 'area_right';
+    manualAreaHistory = [];
+  } else if (target === 'area_right') {
+    document.getElementById('manual_area_right').value = idx;
+    document.getElementById('pick_target').value = 'area_left';
+    manualAreaHistory = [];
+  } else if (target === 'area2_left') {
+    document.getElementById('manual_area2_left').value = idx;
+    document.getElementById('pick_target').value = 'area2_right';
+    manualArea2History = [];
+  } else if (target === 'area2_right') {
+    document.getElementById('manual_area2_right').value = idx;
+    document.getElementById('pick_target').value = 'area2_left';
+    manualArea2History = [];
+  } else {
+    document.getElementById(target === '0' ? 'peak0' : 'peak1').value = idx;
+    document.getElementById('pick_target').value = target === '0' ? '1' : '0';
+  }
+  measurePeaks();
+}
+
+function updateCursor(event, channelIndex) {
+  const item = plotCanvases[channelIndex];
+  const idx = eventToSampleIndex(event, item.canvas, item.data.length);
+  const value = item.data[idx];
+  document.getElementById('cursorInfo').textContent =
+    `${latestFrame.channels[channelIndex]}  index=${idx}  value=${value.toFixed(6)} V`;
+}
+
+function eventToSampleIndex(event, canvas, length) {
+  const rect = canvas.getBoundingClientRect();
+  const x = Math.min(Math.max(event.clientX - rect.left, 0), rect.width);
+  const range = getVisibleRange(length);
+  return Math.round(range.start + (x / Math.max(1, rect.width)) * (range.end - range.start));
+}
+
+function updatePeakTable() {
+  const rows = document.getElementById('peakRows');
+  if (!latestMeasurement || !latestMeasurement.measurements) {
+    rows.innerHTML = '<tr><td>P1</td><td>--</td><td>--</td><td>--</td></tr><tr><td>P2</td><td>--</td><td>--</td><td>--</td></tr>';
+    return;
+  }
+  rows.innerHTML = latestMeasurement.measurements.map((m, i) => `
+    <tr>
+      <td>${i === 0 ? 'P1' : 'P2'}</td>
+      <td>${m.index}</td>
+      <td>${Number(m.value).toExponential(6)}</td>
+      <td>${m.window_left}-${m.window_right}</td>
+    </tr>
+  `).join('');
+}
+
+function updateManualAreaHistory() {
+  if (!latestMeasurement || !latestMeasurement.manual_area) return;
+  const value = Number(latestMeasurement.manual_area.value);
+  if (!Number.isFinite(value)) return;
+  manualAreaHistory.push(value);
+  if (manualAreaHistory.length > 200) {
+    manualAreaHistory = manualAreaHistory.slice(-200);
+  }
+}
+
+function getAreaByName(name) {
+  const areas = latestMeasurement && Array.isArray(latestMeasurement.manual_areas)
+    ? latestMeasurement.manual_areas
+    : [];
+  return areas.find(area => area.name === name) || null;
+}
+
+function pushAreaHistory(history, area) {
+  if (!area) return history;
+  const value = Number(area.value);
+  if (!Number.isFinite(value)) return history;
+  const next = [...history, value];
+  return next.length > 200 ? next.slice(-200) : next;
+}
+
+function updateDualAreaHistory() {
+  // A 窗口复用旧 manual_area；B 窗口读取新增 manual_areas 里的 B。
+  // 这里只保存最近 200 帧，目的是看 shot-to-shot 抖动，不做长期存档。
+  const areaA = getAreaByName('A') || (latestMeasurement ? latestMeasurement.manual_area : null);
+  const areaB = getAreaByName('B');
+  manualAreaHistory = pushAreaHistory(manualAreaHistory, areaA);
+  manualArea2History = pushAreaHistory(manualArea2History, areaB);
+}
+
+function updateManualAreaTable() {
+  const rows = document.getElementById('manualAreaRows');
+  const trendStats = getActiveAreaStats();
+  if (trendStats) {
+    rows.innerHTML = `
+      <tr><td>范围</td><td>${trendStats.area_left}-${trendStats.area_right}</td></tr>
+      <tr><td>当前面积</td><td>${Number(trendStats.area_current).toExponential(6)}</td></tr>
+      <tr><td>均值</td><td>${Number(trendStats.area_mean).toExponential(6)}</td></tr>
+      <tr><td>EMA</td><td>${trendStats.area_ema === null || trendStats.area_ema === undefined ? '--' : Number(trendStats.area_ema).toExponential(6)}</td></tr>
+      <tr><td>标准差</td><td>${Number(trendStats.area_std).toExponential(6)} / ${trendStats.sample_count} 帧</td></tr>
+    `;
+    return;
+  }
+
+  const area = latestMeasurement ? latestMeasurement.manual_area : null;
+  if (!area) {
+    rows.innerHTML = '<tr><td>面积</td><td>--</td></tr><tr><td>最近抖动</td><td>--</td></tr>';
+    return;
+  }
+
+  const mean = manualAreaHistory.length
+    ? manualAreaHistory.reduce((sum, value) => sum + value, 0) / manualAreaHistory.length
+    : Number(area.value);
+  const variance = manualAreaHistory.length
+    ? manualAreaHistory.reduce((sum, value) => sum + (value - mean) ** 2, 0) / manualAreaHistory.length
+    : 0;
+  const std = Math.sqrt(variance);
+  rows.innerHTML = `
+    <tr><td>范围</td><td>${area.left_index}-${area.right_index}，${area.point_count} 点</td></tr>
+    <tr><td>面积</td><td>${Number(area.value).toExponential(6)}</td></tr>
+    <tr><td>最近均值</td><td>${mean.toExponential(6)}</td></tr>
+    <tr><td>最近标准差</td><td>${std.toExponential(6)} / ${manualAreaHistory.length} 帧</td></tr>
+  `;
+}
+
+function trendAreaStats(name) {
+  const stats = getActiveAreaStats();
+  if (!stats) return null;
+  if (name === 'A') {
+    return {
+      range: `${stats.area_left}-${stats.area_right}`,
+      current: stats.area_current,
+      mean: stats.area_mean,
+      ema: stats.area_ema,
+      std: stats.area_std,
+      sampleCount: stats.sample_count,
+    };
+  }
+  if (stats.area2_left === null || stats.area2_left === undefined) return null;
+  return {
+    range: `${stats.area2_left}-${stats.area2_right}`,
+    current: stats.area2_current,
+    mean: stats.area2_mean,
+    ema: stats.area2_ema,
+    std: stats.area2_std,
+    sampleCount: stats.sample_count,
+  };
+}
+
+function formatTrendAreaStats(stats) {
+  if (!stats || stats.current === null || stats.current === undefined) {
+    return {range: '--', current: '--', stats: '--'};
+  }
+  const meanText = stats.mean === null || stats.mean === undefined
+    ? '--'
+    : Number(stats.mean).toExponential(6);
+  const stdText = stats.std === null || stats.std === undefined
+    ? '--'
+    : Number(stats.std).toExponential(6);
+  const emaText = stats.ema === null || stats.ema === undefined
+    ? '--'
+    : Number(stats.ema).toExponential(6);
+  return {
+    range: stats.range,
+    current: Number(stats.current).toExponential(6),
+    stats: `${meanText} / ${stdText} / EMA ${emaText} / ${stats.sampleCount || 0} 帧`,
+  };
+}
+
+function areaStats(history, area) {
+  if (!area) {
+    return {
+      range: '--',
+      current: '--',
+      stats: '--',
+    };
+  }
+  const values = history.length ? history : [Number(area.value)];
+  const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+  const variance = values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / values.length;
+  const std = Math.sqrt(variance);
+  return {
+    range: `${area.left_index}-${area.right_index}，${area.point_count} 点`,
+    current: Number(area.value).toExponential(6),
+    stats: `${mean.toExponential(6)} / ${std.toExponential(6)} / ${values.length} 帧`,
+  };
+}
+
+function updateDualAreaTable() {
+  const rows = document.getElementById('dualAreaRows');
+  const trendStats = getActiveAreaStats();
+  if (trendStats) {
+    const statsA = formatTrendAreaStats(trendAreaStats('A'));
+    const statsB = formatTrendAreaStats(trendAreaStats('B'));
+    rows.innerHTML = `
+      <tr><td>A</td><td>${statsA.range}</td><td>${statsA.current}</td><td>${statsA.stats}</td></tr>
+      <tr><td>B</td><td>${statsB.range}</td><td>${statsB.current}</td><td>${statsB.stats}</td></tr>
+    `;
+    return;
+  }
+
+  const areaA = getAreaByName('A') || (latestMeasurement ? latestMeasurement.manual_area : null);
+  const areaB = getAreaByName('B');
+  const statsA = areaStats(manualAreaHistory, areaA);
+  const statsB = areaStats(manualArea2History, areaB);
+  rows.innerHTML = `
+    <tr><td>A</td><td>${statsA.range}</td><td>${statsA.current}</td><td>${statsA.stats}</td></tr>
+    <tr><td>B</td><td>${statsB.range}</td><td>${statsB.current}</td><td>${statsB.stats}</td></tr>
+  `;
+}
+
+function trendPeakHeightStats(name) {
+  // 峰高和面积直接读取同一条后端统计记录，确保动态窗口、帧数和 EMA 完全一致。
+  const stats = getActiveAreaStats();
+  if (!stats) return null;
+  if (name === 'A') {
+    return {
+      index: stats.peak_height_index,
+      current: stats.peak_height_current,
+      mean: stats.peak_height_mean,
+      std: stats.peak_height_std,
+      ema: stats.peak_height_ema,
+      sampleCount: stats.sample_count,
+    };
+  }
+  if (stats.peak2_height_current === null || stats.peak2_height_current === undefined) return null;
+  return {
+    index: stats.peak2_height_index,
+    current: stats.peak2_height_current,
+    mean: stats.peak2_height_mean,
+    std: stats.peak2_height_std,
+    ema: stats.peak2_height_ema,
+    sampleCount: stats.sample_count,
+  };
+}
+
+function formatTrendPeakHeightStats(stats) {
+  if (!stats || stats.current === null || stats.current === undefined) {
+    return {index: '--', current: '--', stats: '--'};
+  }
+  const meanText = stats.mean === null || stats.mean === undefined
+    ? '--'
+    : Number(stats.mean).toExponential(6);
+  const stdText = stats.std === null || stats.std === undefined
+    ? '--'
+    : Number(stats.std).toExponential(6);
+  const emaText = stats.ema === null || stats.ema === undefined
+    ? '--'
+    : Number(stats.ema).toExponential(6);
+  return {
+    index: stats.index === null || stats.index === undefined ? '--' : String(stats.index),
+    current: Number(stats.current).toExponential(6),
+    stats: `${meanText} / ${stdText} / EMA ${emaText} / ${stats.sampleCount || 0} 帧`,
+  };
+}
+
+function updateDualPeakHeightTable() {
+  const rows = document.getElementById('dualPeakHeightRows');
+  if (!rows) return;
+  const statsA = formatTrendPeakHeightStats(trendPeakHeightStats('A'));
+  const statsB = formatTrendPeakHeightStats(trendPeakHeightStats('B'));
+  rows.innerHTML = `
+    <tr><td>A</td><td>${statsA.index}</td><td>${statsA.current}</td><td>${statsA.stats}</td></tr>
+    <tr><td>B</td><td>${statsB.index}</td><td>${statsB.current}</td><td>${statsB.stats}</td></tr>
+  `;
+}
+
+
+function trendTopStats(name) {
+  // Top 与面积、峰高读取同一条后端统计记录，三者使用完全相同的帧和动态窗口。
+  const stats = getActiveAreaStats();
+  if (!stats) return null;
+  if (name === 'A') {
+    return {
+      range: `${stats.area_left}-${stats.area_right}`,
+      pointCount: stats.top_point_count,
+      percent: stats.top_percent,
+      current: stats.top_current,
+      mean: stats.top_mean,
+      std: stats.top_std,
+      ema: stats.top_ema,
+      sampleCount: stats.sample_count,
+    };
+  }
+  if (stats.top2_current === null || stats.top2_current === undefined) return null;
+  return {
+    range: `${stats.area2_left}-${stats.area2_right}`,
+    pointCount: stats.top2_point_count,
+    percent: stats.top_percent,
+    current: stats.top2_current,
+    mean: stats.top2_mean,
+    std: stats.top2_std,
+    ema: stats.top2_ema,
+    sampleCount: stats.sample_count,
+  };
+}
+
+function formatTrendTopStats(stats) {
+  if (!stats || stats.current === null || stats.current === undefined) {
+    return {window: '--', current: '--', stats: '--'};
+  }
+  const meanText = stats.mean === null || stats.mean === undefined
+    ? '--'
+    : Number(stats.mean).toExponential(6);
+  const stdText = stats.std === null || stats.std === undefined
+    ? '--'
+    : Number(stats.std).toExponential(6);
+  const emaText = stats.ema === null || stats.ema === undefined
+    ? '--'
+    : Number(stats.ema).toExponential(6);
+  const percentText = Number(stats.percent).toFixed(3).replace(/\.?0+$/, '');
+  return {
+    window: `${stats.range} / ${stats.pointCount || 0}点 (${percentText}%)`,
+    current: Number(stats.current).toExponential(6),
+    stats: `${meanText} / ${stdText} / EMA ${emaText} / ${stats.sampleCount || 0} 帧`,
+  };
+}
+
+function updateDualTopTable() {
+  const rows = document.getElementById('dualTopRows');
+  if (!rows) return;
+  const statsA = formatTrendTopStats(trendTopStats('A'));
+  const statsB = formatTrendTopStats(trendTopStats('B'));
+  rows.innerHTML = `
+    <tr><td>A</td><td>${statsA.window}</td><td>${statsA.current}</td><td>${statsA.stats}</td></tr>
+    <tr><td>B</td><td>${statsB.window}</td><td>${statsB.current}</td><td>${statsB.stats}</td></tr>
+  `;
+}
+
+
+function updateFrameInfo() {
+  if (!latestFrame) return;
+  const trig = latestFrame.trigger_enabled
+    ? `  trigger=${latestFrame.trigger_source} ${latestFrame.trigger_edge} ${latestFrame.trigger_mode || 'start_only'}`
+    : '  trigger=off';
+  const frameMs = latestFrame.frame_duration_ms !== undefined
+    ? `  frame=${formatNumber(latestFrame.frame_duration_ms, 3)} ms`
+    : '';
+  const frameHz = latestFrame.frame_rate_hz !== undefined
+    ? `  fps=${formatNumber(latestFrame.frame_rate_hz, 3)} Hz`
+    : '';
+  const resync = latestFrame.resync_every_frames
+    ? `  resync=${latestFrame.resync_every_frames} frames seg=${latestFrame.segment_id || 0}:${latestFrame.segment_frame_id || 0}`
+    : '';
+  document.getElementById('frameInfo').textContent =
+    `channels=${latestFrame.channels.join(', ')}  rate=${latestFrame.rate_per_channel} Hz  samples=${latestFrame.samples_per_channel}${frameMs}${frameHz}${trig}${resync}`;
+}
+
+window.addEventListener('resize', resizeAndDraw);
+for (const id of ['rate', 'samples']) {
+  document.getElementById(id).addEventListener('input', () => {
+    updateDerivedTimingFromInputs();
+    updateWindowVoltageEstimate();
+  });
+}
+for (const id of ['manual_area_left', 'manual_area_right', 'manual_area2_left', 'manual_area2_right']) {
+  document.getElementById(id).addEventListener('input', () => {
+    if (id.startsWith('manual_area2')) {
+      manualArea2History = [];
+    } else {
+      manualAreaHistory = [];
+    }
+    updateManualAreaTable();
+    updateDualAreaTable();
+    updateWindowVoltageEstimate();
+    renderPlots();
+  });
+}
+document.getElementById('window_voltage_mode').addEventListener('change', updateWindowVoltageEstimate);
+document.getElementById('record_full_frame').addEventListener('change', updateWindowVoltageEstimate);
+document.getElementById('sync_power_api_url').addEventListener('change', () => {
+  refreshSyncTestStatus(false);
+});
+updateDerivedTimingFromInputs();
+updateWindowVoltageEstimate();
+updateStreamStatus({running: false, frame_id: 0});
+updatePeakTable();
+updateManualAreaTable();
+updateDualAreaTable();
+loadDefaults();
+refreshSavedSamples();
+syncBackendStreamStatus(true);
+refreshTrendStatus(true);
+refreshSyncTestStatus(false);
+syncTestTimer = setInterval(() => refreshSyncTestStatus(false), 1000);
+refreshAoScanStatus(true);
+refreshPowerLockStatus(true);
+</script>
+</body>
+</html>

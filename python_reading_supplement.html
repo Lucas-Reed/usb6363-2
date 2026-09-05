@@ -1,0 +1,1159 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Python 读码补充训练</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --paper: #fff;
+      --ink: #202936;
+      --muted: #657386;
+      --line: #dbe3ed;
+      --soft: #edf3f8;
+      --blue: #1f6f9f;
+      --blue-dark: #15577e;
+      --green: #247a5d;
+      --green-soft: #e8f5ef;
+      --red: #b34343;
+      --red-soft: #fff0f0;
+      --amber: #9a6518;
+      --amber-soft: #fff5df;
+      --code: #111923;
+      --code-ink: #eaf2f8;
+      --shadow: 0 16px 44px rgba(28, 43, 62, .12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", Arial, sans-serif;
+      line-height: 1.68;
+    }
+    button, textarea { font: inherit; }
+    code, pre, textarea { font-family: Consolas, "Cascadia Code", "Courier New", monospace; }
+    code { background: #e9eef5; border-radius: 5px; padding: 1px 5px; color: #213346; }
+    .shell { min-height: 100vh; display: grid; grid-template-columns: 315px minmax(0, 1fr); }
+    .side {
+      position: sticky; top: 0; height: 100vh; overflow-y: auto;
+      background: #fbfcfe; border-right: 1px solid var(--line); padding: 18px 16px;
+    }
+    .brand { padding: 6px 6px 16px; border-bottom: 1px solid var(--line); }
+    .brand h1 { margin: 0; font-size: 21px; line-height: 1.25; letter-spacing: 0; }
+    .brand p { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
+    .meter { margin: 16px 6px; }
+    .meter-row { display: flex; justify-content: space-between; color: var(--muted); font-size: 13px; margin-bottom: 8px; }
+    .meter-track { height: 8px; border-radius: 999px; background: #dfe7ef; overflow: hidden; }
+    .meter-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--blue), var(--green)); transition: width .2s ease; }
+    .note {
+      margin: 16px 6px; padding: 12px; border-radius: 8px;
+      background: var(--soft); color: #354254; font-size: 13px;
+    }
+    .nav-title { margin: 18px 6px 6px; color: var(--muted); font-size: 12px; font-weight: 700; }
+    .nav { display: grid; gap: 6px; }
+    .nav-btn {
+      width: 100%; border: 0; border-radius: 7px; background: transparent; color: var(--ink);
+      display: grid; grid-template-columns: 28px 1fr auto; gap: 8px; align-items: center;
+      padding: 8px; text-align: left; cursor: pointer;
+    }
+    .nav-btn:hover { background: var(--soft); }
+    .nav-btn.active { background: #dcecf7; color: var(--blue-dark); font-weight: 700; }
+    .nav-num {
+      width: 24px; height: 24px; border-radius: 50%; background: #e4ebf2; color: #566579;
+      display: grid; place-items: center; font-size: 12px; font-weight: 700;
+    }
+    .nav-btn.done .nav-num { background: var(--green-soft); color: var(--green); }
+    .nav-kind { color: var(--muted); font-size: 12px; white-space: nowrap; }
+    .main { padding: 24px clamp(16px, 4vw, 46px) 52px; min-width: 0; }
+    .hero { display: grid; gap: 10px; margin-bottom: 20px; }
+    .kicker { margin: 0; color: var(--blue); font-weight: 700; font-size: 13px; }
+    .hero h2 { margin: 0; font-size: clamp(26px, 3.2vw, 42px); line-height: 1.15; letter-spacing: 0; }
+    .hero p { margin: 0; color: var(--muted); max-width: 980px; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .btn {
+      border: 1px solid var(--line); background: var(--paper); color: var(--ink);
+      border-radius: 7px; padding: 8px 12px; cursor: pointer;
+    }
+    .btn:hover { border-color: #adc0d1; background: #f8fbff; }
+    .btn.primary { border-color: var(--blue); background: var(--blue); color: #fff; }
+    .btn.green { border-color: var(--green); background: var(--green); color: #fff; }
+    .grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(340px, .85fr); gap: 20px; align-items: start; }
+    .panel { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); }
+    .lesson { padding: clamp(18px, 3vw, 30px); }
+    .practice { position: sticky; top: 20px; padding: 18px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .tag {
+      display: inline-flex; align-items: center; min-height: 25px; padding: 3px 10px; border-radius: 999px;
+      background: #edf5fb; color: #285b7a; font-size: 12px; font-weight: 700;
+    }
+    .tag.green { background: var(--green-soft); color: var(--green); }
+    .lesson h3, .practice h3 { margin: 18px 0 8px; font-size: 21px; line-height: 1.3; letter-spacing: 0; }
+    .practice h3 { margin-top: 0; font-size: 18px; }
+    .lesson h4 { margin: 15px 0 8px; font-size: 17px; letter-spacing: 0; }
+    .lesson p, .lesson li, .practice p { color: #303b49; }
+    .lesson ul, .lesson ol { padding-left: 22px; }
+    .code {
+      background: var(--code); color: var(--code-ink); border-radius: 8px; padding: 14px;
+      overflow-x: auto; font-size: 14px; line-height: 1.55; white-space: pre;
+    }
+    .callout {
+      margin: 16px 0; border-left: 4px solid var(--blue); background: #eef7fc;
+      border-radius: 0 7px 7px 0; padding: 12px 14px;
+    }
+    .callout.warn { border-left-color: var(--amber); background: var(--amber-soft); }
+    table { width: 100%; border-collapse: collapse; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; margin: 14px 0; }
+    th, td { border-bottom: 1px solid var(--line); padding: 9px 10px; text-align: left; vertical-align: top; }
+    th { background: #edf2f7; }
+    tr:last-child td { border-bottom: 0; }
+    .explain-list { display: grid; gap: 8px; margin: 12px 0; }
+    .explain-row {
+      display: grid; grid-template-columns: minmax(160px, .4fr) minmax(0, 1fr);
+      gap: 10px; border: 1px solid var(--line); border-radius: 8px; background: #fbfdff; padding: 10px;
+    }
+    .explain-row strong { color: #213346; }
+    .options { display: grid; gap: 8px; margin-top: 10px; }
+    .option {
+      border: 1px solid var(--line); background: #fbfdff; border-radius: 7px;
+      padding: 10px 11px; cursor: pointer; text-align: left;
+    }
+    .option:hover { border-color: #aebed0; }
+    .option.correct { background: var(--green-soft); border-color: #a8d7c3; }
+    .option.wrong { background: var(--red-soft); border-color: #e0b0b0; }
+    .editor {
+      width: 100%; min-height: 185px; resize: vertical; border: 1px solid #b8c6d6; border-radius: 8px;
+      background: var(--code); color: var(--code-ink); padding: 12px; font-size: 14px; line-height: 1.5;
+    }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+    .feedback, .hint, .answer {
+      border: 1px solid var(--line); background: #f3f6f9; color: #354254;
+      border-radius: 7px; padding: 10px 12px; min-height: 42px;
+    }
+    .feedback.good { background: var(--green-soft); border-color: #a8d7c3; color: var(--green); }
+    .feedback.bad { background: var(--red-soft); border-color: #e0b0b0; color: var(--red); }
+    .hint, .answer { display: none; margin-top: 10px; }
+    .footer-nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); }
+    @media (max-width: 1040px) {
+      .shell { grid-template-columns: 1fr; }
+      .side { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+      .nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid { grid-template-columns: 1fr; }
+      .practice { position: static; }
+    }
+    @media (max-width: 640px) {
+      .main { padding: 18px 12px 36px; }
+      .nav { grid-template-columns: 1fr; }
+      .explain-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="side">
+      <div class="brand">
+        <h1>Python 读码补充训练</h1>
+        <p>按“讲解-实例-拆解-选择题-手写练习”的节奏补齐工程化知识。</p>
+      </div>
+      <div class="meter">
+        <div class="meter-row"><span>完成关卡</span><strong id="progressText">0 / 0</strong></div>
+        <div class="meter-track"><div class="meter-fill" id="progressFill"></div></div>
+      </div>
+      <div class="note">
+        这份是补充训练，不替代 4 小时基础课。卡住就看提示，重点是以后读源码时能认出来。
+      </div>
+      <div id="navRoot"></div>
+    </aside>
+
+    <main class="main">
+      <section class="hero">
+        <p class="kicker" id="lessonKicker">补充训练</p>
+        <h2 id="lessonTitle">加载中</h2>
+        <p id="lessonGoal"></p>
+        <div class="toolbar">
+          <button class="btn" id="prevBtn" type="button">上一关</button>
+          <button class="btn primary" id="nextBtn" type="button">下一关</button>
+          <button class="btn green" id="doneBtn" type="button">我理解了</button>
+          <button class="btn" id="resetBtn" type="button">重置进度</button>
+        </div>
+      </section>
+
+      <section class="grid">
+        <article class="panel lesson">
+          <div class="tags" id="tagRoot"></div>
+          <div id="contentRoot"></div>
+          <div class="footer-nav">
+            <button class="btn" id="prevBtn2" type="button">上一关</button>
+            <button class="btn primary" id="nextBtn2" type="button">下一关</button>
+          </div>
+        </article>
+        <aside class="panel practice">
+          <div id="practiceRoot"></div>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const modules = [
+      { name: "工程读码符号", lessons: [0, 1, 2, 3, 4, 5] },
+      { name: "字符串、正则、数据转换", lessons: [6, 7, 8, 9, 10, 11] },
+      { name: "HTTP、命令行、并发", lessons: [12, 13, 14, 15, 16, 17] },
+      { name: "类结构和项目复盘", lessons: [18, 19, 20, 21, 22, 23] }
+    ];
+
+    const lessons = [
+      {
+        title: "文档字符串和注释",
+        kind: "doc",
+        tags: ["docstring", "注释", "读函数"],
+        goal: "能区分注释、文件说明、函数说明，并知道读源码时先看它们。",
+        concept: `
+          <p>注释和文档字符串都不是给机器做计算用的，而是给人读代码用的。<code>#</code> 是普通注释；三引号字符串如果放在文件、类、函数开头，通常就是文档字符串。</p>
+          <p>读陌生代码时，先看 docstring，能快速知道这个文件或函数承担什么角色。</p>
+        `,
+        example: `"""USB-6363 API 的客户端工具。"""\n\n# 默认连接本机服务\nDEFAULT_BASE_URL = "http://127.0.0.1:8765"\n\n\ndef health(self):\n    """检查服务是否正在运行。"""\n    return self._get("/health")`,
+        breakdown: [
+          ["文件顶部三引号", "说明整个文件的用途。"],
+          ["# 默认连接本机服务", "普通注释，只给人看。"],
+          ["函数里的三引号", "说明 health 这个函数做什么。"],
+          ["return self._get(...)", "这才是真正执行的代码。"]
+        ],
+        quiz: {
+          prompt: "docstring 的主要作用是什么？",
+          options: [["解释文件、类或函数的用途", true], ["让代码自动运行更快", false], ["替代 return", false]],
+          explain: "docstring 是说明文字，不负责执行逻辑。"
+        },
+        practice: {
+          title: "给函数加说明",
+          task: "写一个 health 函数，函数第一行放 docstring：检查服务。",
+          starter: "def health():\n    ",
+          checks: [
+            ["def\\s+health\\s*\\(\\s*\\)\\s*:", "需要定义 def health():。"],
+            ["[\"']{3}检查服务[\"']{3}", "函数体第一部分需要三引号 docstring：检查服务。"]
+          ],
+          hint: "三引号字符串要缩进在函数里面。",
+          answer: "def health():\n    \"\"\"检查服务\"\"\"\n    return True"
+        }
+      },
+      {
+        title: "复杂类型提示",
+        kind: "typing",
+        tags: ["类型提示", "Any", "None"],
+        goal: "把 dict[str, Any]、A | None、float | list[float] 翻译成人话。",
+        concept: `
+          <p>类型提示不是运行魔法，主要是帮人和编辑器理解输入输出。项目里常见的是“容器类型”和“可能是多种类型”。</p>
+          <table><tr><th>写法</th><th>读法</th></tr><tr><td><code>dict[str, Any]</code></td><td>键是字符串，值可以是各种类型。</td></tr><tr><td><code>dict[str, Any] | None</code></td><td>要么是字典，要么是 None。</td></tr><tr><td><code>float | list[float]</code></td><td>要么一个小数，要么一串小数。</td></tr></table>
+        `,
+        example: `def _get(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:\n    ...`,
+        breakdown: [
+          ["path: str", "path 应该是字符串。"],
+          ["params: dict[str, Any] | None", "params 可以是字典，也可以没有。"],
+          ["= None", "默认没有参数。"],
+          ["-> dict[str, Any]", "函数预计返回字典。"]
+        ],
+        quiz: {
+          prompt: "dict[str, Any] | None 表示什么？",
+          options: [["字典或 None", true], ["只能是字符串", false], ["一定是列表", false]],
+          explain: "| 在类型提示里可以读成“或者”。"
+        },
+        practice: {
+          title: "补一个类型提示",
+          task: "写函数头：def decode(raw: bytes) -> dict[str, Any]:",
+          starter: "",
+          checks: [
+            ["def\\s+decode\\s*\\(\\s*raw\\s*:\\s*bytes\\s*\\)\\s*->\\s*dict\\s*\\[\\s*str\\s*,\\s*Any\\s*\\]\\s*:", "需要写出指定函数头。"]
+          ],
+          hint: "照题目写函数头即可，不需要函数体也能过检查。",
+          answer: "def decode(raw: bytes) -> dict[str, Any]:\n    pass"
+        }
+      },
+      {
+        title: "对象属性和 __dict__",
+        kind: "object",
+        tags: ["属性", "__dict__", "JSON"],
+        goal: "知道对象.属性是什么，以及为什么项目里用 device.__dict__。",
+        concept: `
+          <p>对象属性就是挂在对象身上的变量。<code>device.name</code> 读取设备对象的 name 属性。<code>__dict__</code> 常能把对象属性拿成一个字典，方便转 JSON。</p>
+        `,
+        example: `devices = [device.__dict__ for device in controller.list_devices()]\nself._send_json({"devices": devices})`,
+        breakdown: [
+          ["controller.list_devices()", "得到一组 DeviceInfo 对象。"],
+          ["device.__dict__", "把一个对象的属性变成字典。"],
+          ["[... for device in ...]", "对每个设备都做一次转换。"],
+          ["_send_json", "把字典形式的数据发给客户端。"]
+        ],
+        quiz: {
+          prompt: "device.__dict__ 在这里主要是为了什么？",
+          options: [["把对象变成更容易转 JSON 的字典", true], ["删除设备", false], ["启动硬件任务", false]],
+          explain: "JSON 更容易处理 dict/list/str/number/bool 这类基础数据。"
+        },
+        practice: {
+          title: "把对象列表转字典列表",
+          task: "写一行列表推导式：items = [item.__dict__ for item in objects]",
+          starter: "objects = []\n",
+          checks: [
+            ["items\\s*=\\s*\\[\\s*item\\.__dict__\\s+for\\s+item\\s+in\\s+objects\\s*\\]", "需要 items = [item.__dict__ for item in objects]。"]
+          ],
+          hint: "结构和 devices 那行一样，只是变量名换了。",
+          answer: "objects = []\nitems = [item.__dict__ for item in objects]"
+        }
+      },
+      {
+        title: "下划线开头的方法",
+        kind: "style",
+        tags: ["内部方法", "约定", "API"],
+        goal: "知道 _get、_post、_normalize_channel 这类名字通常不是普通入口。",
+        concept: `
+          <p>单下划线开头是 Python 社区常见约定：这个名字主要给模块或类内部用。它不是语法禁止，但读代码时要知道它不是推荐的公开入口。</p>
+        `,
+        example: `def read_ai(self, channel="ai0"):\n    return self._get("/api/ai/read", {"channel": channel})`,
+        breakdown: [
+          ["read_ai", "公开方法，普通脚本应该调用它。"],
+          ["_get", "内部辅助方法，负责 HTTP GET。"],
+          ["return self._get(...)", "公开方法把实际网络请求委托给内部方法。"]
+        ],
+        quiz: {
+          prompt: "普通实验脚本更应该调用哪个？",
+          options: [["daq.read_ai(channel=\"ai0\")", true], ["daq._get(...)", false]],
+          explain: "read_ai 是公开接口，_get 是内部实现细节。"
+        },
+        practice: {
+          title: "写一个公开方法调用内部方法",
+          task: "写方法 get_device(self)，返回 self._get('/api/device')。",
+          starter: "def get_device(self):\n    ",
+          checks: [
+            ["def\\s+get_device\\s*\\(\\s*self\\s*\\)\\s*:", "需要 def get_device(self):。"],
+            ["return\\s+self\\._get\\s*\\(\\s*[\"']/api/device[\"']\\s*\\)", "需要 return self._get(\"/api/device\")。"]
+          ],
+          hint: "这是一段类里面的方法，不需要写完整 class。",
+          answer: "def get_device(self):\n    return self._get(\"/api/device\")"
+        }
+      },
+      {
+        title: "*args 和 **kwargs",
+        kind: "params",
+        tags: ["参数", "*args", "**kwargs"],
+        goal: "能读懂函数接收任意位置参数和任意关键字参数。",
+        concept: `
+          <p><code>*args</code> 接收多余的位置参数，形成 tuple；<code>**kwargs</code> 接收多余的关键字参数，形成 dict。项目里更常见的是下一节的 <code>**字典展开</code>，但先知道这套概念会更稳。</p>
+        `,
+        example: `def show(*args, **kwargs):\n    print(args)\n    print(kwargs)\n\nshow(1, 2, channel="ai0", samples=10)`,
+        breakdown: [
+          ["1, 2", "进入 args，变成 (1, 2)。"],
+          ["channel='ai0'", "进入 kwargs 字典。"],
+          ["samples=10", "也进入 kwargs 字典。"]
+        ],
+        quiz: {
+          prompt: "show(channel='ai0') 中 channel 会进入哪里？",
+          options: [["kwargs", true], ["args", false], ["函数名", false]],
+          explain: "带名字的参数是关键字参数，会被 **kwargs 接住。"
+        },
+        practice: {
+          title: "写一个接收 kwargs 的函数",
+          task: "定义 show_config(**kwargs)，打印 kwargs。",
+          starter: "",
+          checks: [
+            ["def\\s+show_config\\s*\\(\\s*\\*\\*kwargs\\s*\\)\\s*:", "需要 def show_config(**kwargs):。"],
+            ["print\\s*\\(\\s*kwargs\\s*\\)", "需要 print(kwargs)。"]
+          ],
+          hint: "两个星号写在 kwargs 前面。",
+          answer: "def show_config(**kwargs):\n    print(kwargs)"
+        }
+      },
+      {
+        title: "**字典展开",
+        kind: "params",
+        tags: ["**dict", "参数展开", "server"],
+        goal: "看懂 controller.read_ai_voltage(**_ai_args(query))。",
+        concept: `
+          <p><code>**字典</code> 会把字典展开成关键字参数。这是 server 层把 HTTP 参数交给 core 层的关键写法。</p>
+        `,
+        example: `args = {"channel": "ai0", "samples": 1}\ncontroller.read_ai_voltage(**args)`,
+        breakdown: [
+          ["args", "一个普通字典。"],
+          ["**args", "把字典展开。"],
+          ["read_ai_voltage(channel='ai0', samples=1)", "展开后的等价调用。"]
+        ],
+        quiz: {
+          prompt: "func(**{'x': 1, 'y': 2}) 等价于什么？",
+          options: [["func(x=1, y=2)", true], ["func({'x': 1, 'y': 2})", false], ["func(**x, **y)", false]],
+          explain: "** 会把字典键值对变成关键字参数。"
+        },
+        practice: {
+          title: "展开 args",
+          task: "给定 args，调用 read_ai(**args)。",
+          starter: "args = {\"channel\": \"ai0\", \"samples\": 1}\n",
+          checks: [
+            ["read_ai\\s*\\(\\s*\\*\\*args\\s*\\)", "需要 read_ai(**args)。"]
+          ],
+          hint: "两个星号直接放在 args 前面。",
+          answer: "args = {\"channel\": \"ai0\", \"samples\": 1}\nread_ai(**args)"
+        }
+      },
+      {
+        title: "正则表达式",
+        kind: "regex",
+        tags: ["re", "通道校验", "字符串规则"],
+        goal: "知道项目里的正则是用来检查和提取通道名。",
+        concept: `
+          <p>正则表达式是一种字符串规则。项目里用它判断 <code>ai0</code>、<code>Dev2/ai0</code>、<code>PFI0</code>、<code>port0/line0</code> 这种名字是否合法。</p>
+        `,
+        example: `_AI_RE = re.compile(r"^(?:(?P&lt;device&gt;Dev\\d+)/)?ai(?P&lt;index&gt;\\d+)$")\nmatch = _AI_RE.match("Dev2/ai0")`,
+        breakdown: [
+          ["^ 和 $", "要求从开头匹配到结尾。"],
+          ["Dev\\d+", "Dev 后面跟数字，比如 Dev2。"],
+          ["(?P<index>\\d+)", "把通道编号这一段命名为 index。"],
+          ["match(...)", "拿规则去检查字符串。"]
+        ],
+        quiz: {
+          prompt: "项目里的 _AI_RE 主要用来做什么？",
+          options: [["检查并提取 AI 通道名", true], ["读取电压", false], ["启动 HTTP 服务", false]],
+          explain: "正则只处理字符串规则，不直接碰硬件。"
+        },
+        practice: {
+          title: "编译一个简单正则",
+          task: "写一行：AI_RE = re.compile(r'^ai\\d+$')",
+          starter: "import re\n",
+          checks: [
+            ["AI_RE\\s*=\\s*re\\.compile\\s*\\(\\s*r[\"']\\^ai\\\\d\\+\\$[\"']\\s*\\)", "需要 AI_RE = re.compile(r'^ai\\d+$')。"]
+          ],
+          hint: "r'' 是原始字符串，适合写正则。",
+          answer: "import re\nAI_RE = re.compile(r\"^ai\\d+$\")"
+        }
+      },
+      {
+        title: "match.group 和 a or b",
+        kind: "regex",
+        tags: ["match", "group", "or"],
+        goal: "看懂 match is None、match.group('index')、a or b。",
+        concept: `
+          <p><code>pattern.match(text)</code> 成功时返回 match 对象，失败时返回 None。命名分组可以用 <code>match.group('name')</code> 取出来。<code>a or b</code> 在这里常用于“没有就用默认值”。</p>
+        `,
+        example: `match = _AI_RE.match(channel)\nif match is None:\n    raise ValueError("Invalid channel")\n\ndevice = match.group("device") or self.device_name\nindex = int(match.group("index"))`,
+        breakdown: [
+          ["match is None", "没有匹配成功。"],
+          ["match.group('device')", "取出正则里 device 这一段。"],
+          ["or self.device_name", "如果用户没写设备名，就用默认设备。"],
+          ["int(...)", "把字符串编号转成整数。"]
+        ],
+        quiz: {
+          prompt: "x or default 在 x 为空时会得到什么？",
+          options: [["default", true], ["x", false], ["报错", false]],
+          explain: "or 常用于给空值补默认值。"
+        },
+        practice: {
+          title: "取出 index",
+          task: "写一行：index = int(match.group('index'))",
+          starter: "",
+          checks: [
+            ["index\\s*=\\s*int\\s*\\(\\s*match\\.group\\s*\\(\\s*[\"']index[\"']\\s*\\)\\s*\\)", "需要 index = int(match.group(\"index\"))。"]
+          ],
+          hint: "先 match.group，再 int 转换。",
+          answer: "index = int(match.group(\"index\"))"
+        }
+      },
+      {
+        title: "dataclass(frozen=True)",
+        kind: "data",
+        tags: ["dataclass", "数据容器", "frozen"],
+        goal: "知道 dataclass 是数据容器，frozen=True 表示创建后不希望修改。",
+        concept: `
+          <p><code>dataclass</code> 适合只装数据的小对象。它会自动生成初始化方法，让你少写重复代码。</p>
+        `,
+        example: `@dataclass(frozen=True)\nclass DeviceInfo:\n    name: str\n    product_type: str\n    serial_num: str\n\ninfo = DeviceInfo("Dev2", "USB-6363", "123")`,
+        breakdown: [
+          ["@dataclass", "让 Python 自动生成初始化等方法。"],
+          ["frozen=True", "表示对象创建后不希望再改属性。"],
+          ["name: str", "字段名和类型提示。"],
+          ["DeviceInfo(...)", "创建一个设备信息对象。"]
+        ],
+        quiz: {
+          prompt: "DeviceInfo 这种 dataclass 更像什么？",
+          options: [["只装数据的小盒子", true], ["HTTP 服务器", false], ["循环语句", false]],
+          explain: "它主要保存 name/product_type/serial_num。"
+        },
+        practice: {
+          title: "定义一个 frozen dataclass",
+          task: "定义 ChannelInfo，包含 name: str 和 index: int，要求 frozen=True。",
+          starter: "from dataclasses import dataclass\n\n",
+          checks: [
+            ["@dataclass\\s*\\(\\s*frozen\\s*=\\s*True\\s*\\)", "需要 @dataclass(frozen=True)。"],
+            ["class\\s+ChannelInfo\\s*:", "需要 class ChannelInfo:。"],
+            ["name\\s*:\\s*str", "需要 name: str。"],
+            ["index\\s*:\\s*int", "需要 index: int。"]
+          ],
+          hint: "字段直接写在类里面。",
+          answer: "from dataclasses import dataclass\n\n@dataclass(frozen=True)\nclass ChannelInfo:\n    name: str\n    index: int"
+        }
+      },
+      {
+        title: "@staticmethod",
+        kind: "class",
+        tags: ["staticmethod", "self", "类"],
+        goal: "知道静态方法是不需要 self 的类内函数。",
+        concept: `
+          <p>普通方法需要 <code>self</code>，因为它要访问当前对象。静态方法不需要 <code>self</code>，只是放在类里归类。</p>
+        `,
+        example: `class DaqController:\n    @staticmethod\n    def _edge(name):\n        key = name.strip().upper()\n        return Edge[key]`,
+        breakdown: [
+          ["@staticmethod", "说明下面的方法不需要 self。"],
+          ["def _edge(name)", "参数里没有 self。"],
+          ["name.strip().upper()", "只处理传入的 name。"],
+          ["Edge[key]", "把字符串转成枚举值。"]
+        ],
+        quiz: {
+          prompt: "@staticmethod 方法通常有什么特点？",
+          options: [["不需要 self", true], ["必须访问 self.device_name", false], ["必须返回 None", false]],
+          explain: "静态方法不依赖某个具体对象的属性。"
+        },
+        practice: {
+          title: "写一个静态方法",
+          task: "在类 Tool 里写 @staticmethod 方法 upper(name)，返回 name.upper()。",
+          starter: "class Tool:\n    ",
+          checks: [
+            ["@staticmethod", "需要 @staticmethod。"],
+            ["def\\s+upper\\s*\\(\\s*name\\s*\\)\\s*:", "需要 def upper(name):，不要 self。"],
+            ["return\\s+name\\.upper\\s*\\(\\s*\\)", "需要 return name.upper()。"]
+          ],
+          hint: "@staticmethod 和 def 都要缩进在 class 里面。",
+          answer: "class Tool:\n    @staticmethod\n    def upper(name):\n        return name.upper()"
+        }
+      },
+      {
+        title: "枚举和方括号取值",
+        kind: "enum",
+        tags: ["枚举", "Edge", "选项"],
+        goal: "看懂 Edge[key]、TerminalConfiguration[key] 是把字符串选项转成库对象。",
+        concept: `
+          <p>有些库不用普通字符串表示选项，而是用枚举。项目允许用户传 <code>"RISING"</code>、<code>"RSE"</code> 这种字符串，再转换成 nidaqmx 需要的枚举值。</p>
+        `,
+        example: `key = name.strip().upper()\ntry:\n    return Edge[key]\nexcept KeyError as exc:\n    raise ValueError("invalid edge") from exc`,
+        breakdown: [
+          ["strip().upper()", "清理输入并转大写。"],
+          ["Edge[key]", "按名字取枚举成员。"],
+          ["KeyError", "key 不存在时会触发。"],
+          ["raise ... from exc", "转换错误，同时保留原因。"]
+        ],
+        quiz: {
+          prompt: "Edge['RISING'] 的作用更接近什么？",
+          options: [["把字符串名字转成枚举成员", true], ["读取文件", false], ["创建 HTTP 请求", false]],
+          explain: "方括号按名字从枚举里取对应选项。"
+        },
+        practice: {
+          title: "清理枚举 key",
+          task: "给定 name，写 key = name.strip().upper()。",
+          starter: "name = \" rising \"\n",
+          checks: [
+            ["key\\s*=\\s*name\\.strip\\s*\\(\\s*\\)\\.upper\\s*\\(\\s*\\)", "需要 key = name.strip().upper()。"]
+          ],
+          hint: "先 strip，再 upper。",
+          answer: "name = \" rising \"\nkey = name.strip().upper()"
+        }
+      },
+      {
+        title: "bytes、encode 和 decode",
+        kind: "bytes",
+        tags: ["bytes", "encode", "decode"],
+        goal: "知道网络发送时常要字符串和 bytes 相互转换。",
+        concept: `
+          <p>HTTP 传输底层常处理 bytes。JSON 是字符串，发送前通常 encode 成 bytes；收到 bytes 后 decode 回字符串。</p>
+        `,
+        example: `payload = json.dumps(data).encode("utf-8")\nraw = response.read()\ntext = raw.decode("utf-8")\ndata = json.loads(text)`,
+        breakdown: [
+          ["json.dumps(data)", "Python 数据变 JSON 字符串。"],
+          ["encode('utf-8')", "字符串变 bytes。"],
+          ["response.read()", "读到 bytes。"],
+          ["decode('utf-8')", "bytes 变字符串。"]
+        ],
+        quiz: {
+          prompt: "decode('utf-8') 的方向是什么？",
+          options: [["bytes -> 字符串", true], ["字符串 -> bytes", false], ["dict -> list", false]],
+          explain: "encode 是编码成 bytes，decode 是解码回字符串。"
+        },
+        practice: {
+          title: "把 JSON 字符串编码",
+          task: "写 payload = text.encode('utf-8')。",
+          starter: "text = \"{}\"\n",
+          checks: [
+            ["payload\\s*=\\s*text\\.encode\\s*\\(\\s*[\"']utf-8[\"']\\s*\\)", "需要 payload = text.encode(\"utf-8\")。"]
+          ],
+          hint: "encode 是字符串方法。",
+          answer: "text = \"{}\"\npayload = text.encode(\"utf-8\")"
+        }
+      },
+      {
+        title: "URL 解析：urlparse 和 parse_qs",
+        kind: "http",
+        tags: ["URL", "parse_qs", "server"],
+        goal: "看懂 server 怎么从 URL 里拆出路径和查询参数。",
+        concept: `
+          <p>HTTP GET 请求的参数常在 URL 问号后面。server 需要先拆路径，再解析参数。</p>
+        `,
+        example: `parsed = urlparse(self.path)\nquery = parse_qs(parsed.query)\n\n# /api/ai/read?channel=ai0&samples=100\n# parsed.path  -> "/api/ai/read"\n# query        -> {"channel": ["ai0"], "samples": ["100"]}`,
+        breakdown: [
+          ["urlparse(self.path)", "把完整路径拆成 path/query 等部分。"],
+          ["parsed.path", "真正的路由路径。"],
+          ["parsed.query", "问号后面的原始参数字符串。"],
+          ["parse_qs", "把参数字符串变成字典，值是列表。"]
+        ],
+        quiz: {
+          prompt: "parse_qs('samples=100') 大概得到什么？",
+          options: [["{'samples': ['100']}", true], ["{'samples': 100}", false], ["['samples', '100']", false]],
+          explain: "parse_qs 的值通常是字符串列表。"
+        },
+        practice: {
+          title: "解析 query",
+          task: "写 query = parse_qs(parsed.query)。",
+          starter: "",
+          checks: [
+            ["query\\s*=\\s*parse_qs\\s*\\(\\s*parsed\\.query\\s*\\)", "需要 query = parse_qs(parsed.query)。"]
+          ],
+          hint: "parse_qs 的参数是 parsed.query。",
+          answer: "query = parse_qs(parsed.query)"
+        }
+      },
+      {
+        title: "HTTP 请求和响应对象",
+        kind: "http",
+        tags: ["urlopen", "Request", "response"],
+        goal: "看懂客户端如何发送 GET/POST 并读取响应。",
+        concept: `
+          <p>客户端里 GET 通常直接 <code>urlopen(url)</code>；POST 需要先构造 <code>Request</code>，带上 body、headers 和 method。</p>
+        `,
+        example: `with urlopen(url, timeout=self.timeout) as response:\n    return self._decode_response(response.read())\n\nrequest = Request(url, data=payload, headers={"Content-Type": "application/json"}, method="POST")`,
+        breakdown: [
+          ["with urlopen(...) as response", "发送请求，并自动关闭响应对象。"],
+          ["response.read()", "读响应体 bytes。"],
+          ["Request(...)", "构造 POST 请求。"],
+          ["headers", "告诉 server 请求体是 JSON。"]
+        ],
+        quiz: {
+          prompt: "response.read() 通常读到什么？",
+          options: [["响应体 bytes", true], ["Python 函数", false], ["设备对象", false]],
+          explain: "读到 bytes 后，项目再 decode/json.loads。"
+        },
+        practice: {
+          title: "读取响应体",
+          task: "写 raw = response.read()。",
+          starter: "",
+          checks: [
+            ["raw\\s*=\\s*response\\.read\\s*\\(\\s*\\)", "需要 raw = response.read()。"]
+          ],
+          hint: "read 是 response 对象的方法。",
+          answer: "raw = response.read()"
+        }
+      },
+      {
+        title: "HTTPStatus",
+        kind: "http",
+        tags: ["状态码", "HTTPStatus", "错误响应"],
+        goal: "知道 HTTPStatus.OK、NOT_FOUND、BAD_REQUEST 是更可读的状态码。",
+        concept: `
+          <p>HTTP 状态码可以直接写 200、404、400，但 <code>HTTPStatus</code> 更清楚。</p>
+        `,
+        example: `self._send_json(data, status=HTTPStatus.OK)\nself._send_error(HTTPStatus.NOT_FOUND, "Unknown route")\nself._send_error(HTTPStatus.BAD_REQUEST, str(exc))`,
+        breakdown: [
+          ["HTTPStatus.OK", "200，成功。"],
+          ["HTTPStatus.NOT_FOUND", "404，路由不存在。"],
+          ["HTTPStatus.BAD_REQUEST", "400，请求参数有问题。"],
+          ["_send_error", "把错误也包装成 JSON 返回。"]
+        ],
+        quiz: {
+          prompt: "Unknown route 更适合哪个状态？",
+          options: [["HTTPStatus.NOT_FOUND", true], ["HTTPStatus.OK", false], ["HTTPStatus.BAD_REQUEST", false]],
+          explain: "路径不存在就是 404 Not Found。"
+        },
+        practice: {
+          title: "返回 404 错误",
+          task: "写 self._send_error(HTTPStatus.NOT_FOUND, 'Unknown route')。",
+          starter: "",
+          checks: [
+            ["self\\._send_error\\s*\\(\\s*HTTPStatus\\.NOT_FOUND\\s*,\\s*[\"']Unknown route[\"']\\s*\\)", "需要 self._send_error(HTTPStatus.NOT_FOUND, \"Unknown route\")。"]
+          ],
+          hint: "状态放第一个参数，错误信息放第二个。",
+          answer: "self._send_error(HTTPStatus.NOT_FOUND, \"Unknown route\")"
+        }
+      },
+      {
+        title: "argparse：命令行参数",
+        kind: "cli",
+        tags: ["argparse", "--port", "命令行"],
+        goal: "看懂 server.py 如何支持 --host、--port、--device。",
+        concept: `
+          <p><code>argparse</code> 用来解析命令行参数。这样同一个脚本可以用不同端口或设备名启动。</p>
+        `,
+        example: `parser = argparse.ArgumentParser(description="Run the USB-6363 local API server.")\nparser.add_argument("--port", type=int, default=8765)\nargs = parser.parse_args()\nprint(args.port)`,
+        breakdown: [
+          ["ArgumentParser", "创建命令行参数解析器。"],
+          ["add_argument('--port')", "声明支持 --port 参数。"],
+          ["type=int", "把字符串端口转成整数。"],
+          ["parse_args()", "读取用户实际传入的参数。"]
+        ],
+        quiz: {
+          prompt: "python server.py --port 9000 中 9000 最初来自哪里？",
+          options: [["命令行参数", true], ["函数 return", false], ["JSON 响应", false]],
+          explain: "argparse 会从命令行读取它。"
+        },
+        practice: {
+          title: "添加 port 参数",
+          task: "写 parser.add_argument('--port', type=int, default=8765)。",
+          starter: "",
+          checks: [
+            ["parser\\.add_argument\\s*\\(\\s*[\"']--port[\"']\\s*,\\s*type\\s*=\\s*int\\s*,\\s*default\\s*=\\s*8765\\s*\\)", "需要 parser.add_argument(\"--port\", type=int, default=8765)。"]
+          ],
+          hint: "type=int 不要写成 int()。",
+          answer: "parser.add_argument(\"--port\", type=int, default=8765)"
+        }
+      },
+      {
+        title: "锁和线程",
+        kind: "thread",
+        tags: ["RLock", "并发", "硬件安全"],
+        goal: "理解项目里的锁是为了让硬件访问排队。",
+        concept: `
+          <p><code>ThreadingHTTPServer</code> 可以同时处理多个请求，但 USB-6363 不应该被多个操作同时抢。所以 <code>DaqController</code> 用锁把硬件操作串行化。</p>
+        `,
+        example: `self._lock = threading.RLock()\n\nwith self._lock:\n    self._get_device()\n    with nidaqmx.Task() as task:\n        value = task.read()`,
+        breakdown: [
+          ["RLock", "可重入锁，这里用来保护硬件操作。"],
+          ["with self._lock", "进入硬件操作前先拿锁。"],
+          ["离开 with", "自动释放锁。"],
+          ["效果", "多个请求可以来，但真正碰硬件时排队。"]
+        ],
+        quiz: {
+          prompt: "项目里锁的主要目的是什么？",
+          options: [["避免多个请求同时操作硬件", true], ["让字符串变大写", false], ["解析 JSON", false]],
+          explain: "这是硬件访问的安全边界。"
+        },
+        practice: {
+          title: "写锁保护骨架",
+          task: "写 with self._lock: 然后缩进调用 self._get_device()。",
+          starter: "",
+          checks: [
+            ["with\\s+self\\._lock\\s*:", "需要 with self._lock:。"],
+            ["self\\._get_device\\s*\\(\\s*\\)", "需要调用 self._get_device()。"]
+          ],
+          hint: "self._get_device() 要缩进在 with 里面。",
+          answer: "with self._lock:\n    self._get_device()"
+        }
+      },
+      {
+        title: "内部类和闭包",
+        kind: "class",
+        tags: ["内部类", "闭包", "make_handler"],
+        goal: "看懂 make_handler(controller) 为什么在函数里定义类。",
+        concept: `
+          <p>HTTPServer 需要一个处理器“类”，但项目又想让处理器共享已经创建好的 <code>controller</code>。所以用函数包一层，在函数里面定义类，让内部类记住外层的 controller。</p>
+        `,
+        example: `def make_handler(controller):\n    class Usb6363RequestHandler(BaseHTTPRequestHandler):\n        def do_GET(self):\n            self._send_json(controller.get_device_info().__dict__)\n\n    return Usb6363RequestHandler`,
+        breakdown: [
+          ["make_handler(controller)", "接收已经创建好的硬件控制器。"],
+          ["内部 class", "创建 HTTP 请求处理类。"],
+          ["do_GET 里用 controller", "内部类能访问外层变量。"],
+          ["return Usb6363RequestHandler", "把类交给 HTTPServer 使用。"]
+        ],
+        quiz: {
+          prompt: "make_handler(controller) 返回的是什么？",
+          options: [["一个请求处理类", true], ["一个电压值", false], ["一个 JSON 字符串", false]],
+          explain: "HTTPServer 需要的是 handler class。"
+        },
+        practice: {
+          title: "写一个返回内部类的骨架",
+          task: "写 def make_tool(value): 内部定义 class Tool:，最后 return Tool。",
+          starter: "",
+          checks: [
+            ["def\\s+make_tool\\s*\\(\\s*value\\s*\\)\\s*:", "需要 def make_tool(value):。"],
+            ["class\\s+Tool\\s*:", "需要内部 class Tool:。"],
+            ["return\\s+Tool", "需要 return Tool。"]
+          ],
+          hint: "class Tool 要缩进在 make_tool 里面。",
+          answer: "def make_tool(value):\n    class Tool:\n        pass\n\n    return Tool"
+        }
+      },
+      {
+        title: "继承：class A(B)",
+        kind: "class",
+        tags: ["继承", "BaseHTTPRequestHandler", "重写"],
+        goal: "知道 class Usb6363RequestHandler(BaseHTTPRequestHandler) 表示继承。",
+        concept: `
+          <p>类名后面括号里的类是父类。子类继承父类已有能力，并可以重写某些方法。</p>
+        `,
+        example: `class Usb6363RequestHandler(BaseHTTPRequestHandler):\n    def do_GET(self):\n        ...\n\n    def do_POST(self):\n        ...`,
+        breakdown: [
+          ["BaseHTTPRequestHandler", "标准库提供的 HTTP 处理框架。"],
+          ["Usb6363RequestHandler", "项目自己的处理器。"],
+          ["do_GET", "重写 GET 请求行为。"],
+          ["do_POST", "重写 POST 请求行为。"]
+        ],
+        quiz: {
+          prompt: "class A(B): 中 B 是什么？",
+          options: [["父类 / 基类", true], ["变量值", false], ["异常信息", false]],
+          explain: "A 继承 B。"
+        },
+        practice: {
+          title: "写一个继承声明",
+          task: "写 class MyHandler(BaseHTTPRequestHandler):",
+          starter: "",
+          checks: [
+            ["class\\s+MyHandler\\s*\\(\\s*BaseHTTPRequestHandler\\s*\\)\\s*:", "需要 class MyHandler(BaseHTTPRequestHandler):。"]
+          ],
+          hint: "父类写在类名后面的括号里。",
+          answer: "class MyHandler(BaseHTTPRequestHandler):\n    pass"
+        }
+      },
+      {
+        title: "错误链：raise ... from exc",
+        kind: "error",
+        tags: ["异常", "from exc", "错误转换"],
+        goal: "看懂客户端为什么把 HTTPError 转成 RuntimeError。",
+        concept: `
+          <p>有时底层错误不适合直接丢给调用者。可以捕获它，换成更友好的错误，同时用 <code>from exc</code> 保留原始原因。</p>
+        `,
+        example: `try:\n    with urlopen(url, timeout=self.timeout) as response:\n        return self._decode_response(response.read())\nexcept HTTPError as exc:\n    raise RuntimeError(self._error_message(exc)) from exc`,
+        breakdown: [
+          ["except HTTPError as exc", "捕获 HTTP 层错误。"],
+          ["_error_message(exc)", "尽量提取 server 返回的具体错误。"],
+          ["raise RuntimeError(...)", "换成调用者更容易理解的错误。"],
+          ["from exc", "保留原始 HTTPError 作为原因。"]
+        ],
+        quiz: {
+          prompt: "raise RuntimeError(...) from exc 中 from exc 的作用是？",
+          options: [["保留原始错误原因", true], ["忽略所有错误", false], ["重新启动请求", false]],
+          explain: "调试时可以看到错误链。"
+        },
+        practice: {
+          title: "转换错误",
+          task: "在 except ValueError as exc: 里写 raise RuntimeError('bad') from exc。",
+          starter: "try:\n    value = int(text)\nexcept ValueError as exc:\n    ",
+          checks: [
+            ["except\\s+ValueError\\s+as\\s+exc\\s*:", "需要 except ValueError as exc:。"],
+            ["raise\\s+RuntimeError\\s*\\(\\s*[\"']bad[\"']\\s*\\)\\s+from\\s+exc", "需要 raise RuntimeError(\"bad\") from exc。"]
+          ],
+          hint: "from exc 放在 raise 语句末尾。",
+          answer: "try:\n    value = int(text)\nexcept ValueError as exc:\n    raise RuntimeError(\"bad\") from exc"
+        }
+      },
+      {
+        title: "读一个函数的固定顺序",
+        kind: "method",
+        tags: ["读函数", "方法论", "return"],
+        goal: "形成读函数的步骤，不再逐行硬啃。",
+        concept: `
+          <p>读函数不要从第一行一路硬啃。先看外壳，再看核心，再看返回。</p>
+          <ol><li>函数名：它想做什么。</li><li>参数和默认值：它需要什么。</li><li>docstring：作者怎么解释。</li><li>raise：什么会失败。</li><li>核心调用：真正委托给谁。</li><li>return：返回什么。</li></ol>
+        `,
+        example: `def write_ao_voltage(self, channel="ao0", value=0.0, min_val=-10.0, max_val=10.0):\n    if not min_val <= value <= max_val:\n        raise ValueError("out of range")\n    physical_channel = self._normalize_channel(channel, kind="ao")\n    return {"channel": physical_channel, "value": float(value)}`,
+        breakdown: [
+          ["write_ao_voltage", "写 AO 电压。"],
+          ["value=0.0", "默认写 0V。"],
+          ["raise ValueError", "电压超范围会失败。"],
+          ["return {...}", "返回通道和值的字典。"]
+        ],
+        quiz: {
+          prompt: "读函数时最应该先找哪两个东西？",
+          options: [["参数和 return", true], ["文件大小和颜色", false], ["电脑型号", false]],
+          explain: "输入和输出是理解函数的骨架。"
+        },
+        practice: {
+          title: "标出返回字典",
+          task: "写 return {'ok': True, 'value': value}。",
+          starter: "def result(value):\n    ",
+          checks: [
+            ["return\\s+\\{[^}]*[\"']ok[\"']\\s*:\\s*True[^}]*[\"']value[\"']\\s*:\\s*value[^}]*\\}", "需要返回包含 ok 和 value 的字典。"]
+          ],
+          hint: "字典里两个键：ok 和 value。",
+          answer: "def result(value):\n    return {\"ok\": True, \"value\": value}"
+        }
+      },
+      {
+        title: "读一个类的固定顺序",
+        kind: "method",
+        tags: ["读类", "__init__", "公开方法"],
+        goal: "知道读类时先看 __init__ 和公开方法，再看内部方法。",
+        concept: `
+          <p>类里东西多，不能平均用力。先看这个对象保存什么状态，再看外部能怎么用它。</p>
+          <ol><li>类名和 docstring。</li><li><code>__init__</code> 保存了哪些属性。</li><li>不以下划线开头的公开方法。</li><li>下划线开头的内部辅助方法。</li></ol>
+        `,
+        example: `class Usb6363Client:\n    def __init__(self, base_url=DEFAULT_BASE_URL):\n        self.base_url = base_url.rstrip("/")\n\n    def read_ai(self, channel="ai0"):\n        return self._get("/api/ai/read", {"channel": channel})\n\n    def _get(self, path, params=None):\n        ...`,
+        breakdown: [
+          ["__init__", "保存 base_url。"],
+          ["read_ai", "公开方法，普通使用者调用。"],
+          ["_get", "内部方法，负责 HTTP GET。"],
+          ["self.base_url", "对象属性，被其他方法复用。"]
+        ],
+        quiz: {
+          prompt: "读类时 _get 这类方法通常应该什么时候看？",
+          options: [["看完公开方法之后", true], ["永远不看", false], ["第一眼只看它", false]],
+          explain: "先知道类对外怎么用，再理解内部怎么实现。"
+        },
+        practice: {
+          title: "写 __init__ 保存属性",
+          task: "写 def __init__(self, base_url): self.base_url = base_url。",
+          starter: "class Client:\n    ",
+          checks: [
+            ["def\\s+__init__\\s*\\(\\s*self\\s*,\\s*base_url\\s*\\)\\s*:", "需要 def __init__(self, base_url):。"],
+            ["self\\.base_url\\s*=\\s*base_url", "需要 self.base_url = base_url。"]
+          ],
+          hint: "__init__ 在 class 里缩进，赋值在 __init__ 里再缩进。",
+          answer: "class Client:\n    def __init__(self, base_url):\n        self.base_url = base_url"
+        }
+      },
+      {
+        title: "项目安全边界",
+        kind: "project",
+        tags: ["边界", "nidaqmx", "架构"],
+        goal: "知道为什么普通脚本不直接 import nidaqmx。",
+        concept: `
+          <p>这个项目最重要的设计不是某个语法，而是边界：只有 <code>usb6363_core.py</code> 直接碰硬件，其他脚本通过 client/server 间接访问。</p>
+        `,
+        example: `子程序 -> Usb6363Client -> HTTP API -> usb6363_server -> DaqController -> nidaqmx -> USB-6363`,
+        breakdown: [
+          ["子程序", "表达实验需求。"],
+          ["Usb6363Client", "封装 HTTP 调用。"],
+          ["server", "统一接收请求。"],
+          ["core", "唯一直接调用 nidaqmx 的层。"]
+        ],
+        quiz: {
+          prompt: "未来写普通实验脚本时，最推荐 import 什么？",
+          options: [["Usb6363Client", true], ["nidaqmx", false], ["BaseHTTPRequestHandler", false]],
+          explain: "普通脚本应该走客户端，避免绕过安全边界。"
+        },
+        practice: {
+          title: "写正确的导入",
+          task: "写 from usb6363_client import Usb6363Client。",
+          starter: "",
+          checks: [
+            ["from\\s+usb6363_client\\s+import\\s+Usb6363Client", "需要 from usb6363_client import Usb6363Client。"]
+          ],
+          hint: "不要 import nidaqmx。",
+          answer: "from usb6363_client import Usb6363Client"
+        }
+      },
+      {
+        title: "完整 read_ai 调用链",
+        kind: "project",
+        tags: ["调用链", "read_ai", "复盘"],
+        goal: "能从 daq.read_ai(...) 追到 server/core，再追回返回结果。",
+        concept: `
+          <p>最后把补充篇知识串起来。读懂一条调用链，比背散碎语法更重要。</p>
+        `,
+        example: `ai_result = daq.read_ai(channel="ai0")`,
+        breakdown: [
+          ["daq.read_ai", "客户端公开方法，打包参数。"],
+          ["_get", "发 GET 请求。"],
+          ["server do_GET", "根据 URL 路由到 /api/ai/read。"],
+          ["_ai_args(query)", "把字符串参数转成正确类型。"],
+          ["**_ai_args(query)", "展开成底层函数参数。"],
+          ["read_ai_voltage", "检查参数、规范通道、读硬件。"],
+          ["json.dumps / loads", "server 和 client 之间交换 JSON。"],
+          ["ai_result['values']", "最终脚本从字典取电压值。"]
+        ],
+        quiz: {
+          prompt: "read_ai_voltage(**_ai_args(query)) 中 ** 的作用是什么？",
+          options: [["把参数字典展开成关键字参数", true], ["把代码注释掉", false], ["读取 bytes", false]],
+          explain: "这是 server 把整理好的参数交给 core 的方式。"
+        },
+        practice: {
+          title: "写调用链第一步",
+          task: "创建 daq，调用 daq.read_ai(channel='ai0')，保存为 ai_result。",
+          starter: "daq = Usb6363Client()\n",
+          checks: [
+            ["ai_result\\s*=\\s*daq\\.read_ai\\s*\\(\\s*channel\\s*=\\s*[\"']ai0[\"']\\s*\\)", "需要 ai_result = daq.read_ai(channel=\"ai0\")。"]
+          ],
+          hint: "这就是调用链最外层的代码。",
+          answer: "daq = Usb6363Client()\nai_result = daq.read_ai(channel=\"ai0\")"
+        }
+      }
+    ];
+
+    let current = Number(localStorage.getItem("supplement2.current") || 0);
+    const done = new Set(JSON.parse(localStorage.getItem("supplement2.done") || "[]"));
+
+    const navRoot = document.getElementById("navRoot");
+    const progressText = document.getElementById("progressText");
+    const progressFill = document.getElementById("progressFill");
+    const lessonKicker = document.getElementById("lessonKicker");
+    const lessonTitle = document.getElementById("lessonTitle");
+    const lessonGoal = document.getElementById("lessonGoal");
+    const tagRoot = document.getElementById("tagRoot");
+    const contentRoot = document.getElementById("contentRoot");
+    const practiceRoot = document.getElementById("practiceRoot");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const prevBtn2 = document.getElementById("prevBtn2");
+    const nextBtn2 = document.getElementById("nextBtn2");
+    const doneBtn = document.getElementById("doneBtn");
+    const resetBtn = document.getElementById("resetBtn");
+
+    function save() {
+      localStorage.setItem("supplement2.current", String(current));
+      localStorage.setItem("supplement2.done", JSON.stringify([...done]));
+    }
+
+    function escapeHtml(text) {
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function renderNav() {
+      navRoot.innerHTML = modules.map((mod) => {
+        const buttons = mod.lessons.map((idx) => {
+          const lesson = lessons[idx];
+          const active = idx === current;
+          const isDone = done.has(idx);
+          return `
+            <button class="nav-btn ${active ? "active" : ""} ${isDone ? "done" : ""}" type="button" data-index="${idx}">
+              <span class="nav-num">${isDone ? "✓" : idx + 1}</span>
+              <span>${lesson.title}</span>
+              <span class="nav-kind">${lesson.kind}</span>
+            </button>
+          `;
+        }).join("");
+        return `<div class="nav-title">${mod.name}</div><nav class="nav">${buttons}</nav>`;
+      }).join("");
+      navRoot.querySelectorAll(".nav-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+          current = Number(button.dataset.index);
+          save();
+          render();
+        });
+      });
+    }
+
+    function renderProgress() {
+      progressText.textContent = `${done.size} / ${lessons.length}`;
+      progressFill.style.width = `${Math.round((done.size / lessons.length) * 100)}%`;
+    }
+
+    function renderQuiz(lesson) {
+      const q = lesson.quiz;
+      return `
+        <h3>概念选择题</h3>
+        <p>${q.prompt}</p>
+        <div class="options">
+          ${q.options.map((option) => `
+            <button class="option" type="button" data-correct="${option[1]}">${option[0]}</button>
+          `).join("")}
+        </div>
+        <div class="feedback" id="quizFeedback" style="margin-top:10px;">先选一个答案。</div>
+      `;
+    }
+
+    function renderPractice(lesson) {
+      const p = lesson.practice;
+      practiceRoot.innerHTML = `
+        <h3>${p.title}</h3>
+        <p>${p.task}</p>
+        <textarea class="editor" id="editor" spellcheck="false">${p.starter}</textarea>
+        <div class="actions">
+          <button class="btn green" id="checkBtn" type="button">检查代码</button>
+          <button class="btn" id="hintBtn" type="button">提示</button>
+          <button class="btn" id="answerBtn" type="button">参考答案</button>
+        </div>
+        <div class="feedback" id="practiceFeedback">写一两行代码，然后点击检查。</div>
+        <div class="hint" id="hintBox">${p.hint}</div>
+        <div class="answer" id="answerBox"><strong>一种参考写法：</strong><pre class="code">${escapeHtml(p.answer)}</pre></div>
+      `;
+      document.getElementById("checkBtn").addEventListener("click", () => {
+        const code = document.getElementById("editor").value;
+        const failed = p.checks.find(([pattern]) => !(new RegExp(pattern, "s").test(code)));
+        const feedback = document.getElementById("practiceFeedback");
+        if (failed) {
+          feedback.className = "feedback bad";
+          feedback.textContent = failed[1];
+          return;
+        }
+        done.add(current);
+        save();
+        renderProgress();
+        renderNav();
+        doneBtn.textContent = "已完成";
+        feedback.className = "feedback good";
+        feedback.textContent = "通过。这一节的读码点已经抓住了。";
+      });
+      document.getElementById("hintBtn").addEventListener("click", () => {
+        const box = document.getElementById("hintBox");
+        box.style.display = box.style.display === "block" ? "none" : "block";
+      });
+      document.getElementById("answerBtn").addEventListener("click", () => {
+        const box = document.getElementById("answerBox");
+        box.style.display = box.style.display === "block" ? "none" : "block";
+      });
+    }
+
+    function bindQuiz(lesson) {
+      document.querySelectorAll(".option").forEach((button) => {
+        button.addEventListener("click", () => {
+          const isCorrect = button.dataset.correct === "true";
+          document.querySelectorAll(".option").forEach((option) => {
+            option.classList.remove("wrong", "correct");
+            if (option.dataset.correct === "true") option.classList.add("correct");
+          });
+          if (!isCorrect) button.classList.add("wrong");
+          const feedback = document.getElementById("quizFeedback");
+          feedback.className = `feedback ${isCorrect ? "good" : "bad"}`;
+          feedback.textContent = isCorrect ? `答对了。${lesson.quiz.explain}` : `再看一眼实例拆解。${lesson.quiz.explain}`;
+        });
+      });
+    }
+
+    function render() {
+      const lesson = lessons[current];
+      lessonKicker.textContent = `补充第 ${current + 1} 关 / 共 ${lessons.length} 关`;
+      lessonTitle.textContent = lesson.title;
+      lessonGoal.textContent = lesson.goal;
+      tagRoot.innerHTML = lesson.tags.map((tag, idx) => `<span class="tag ${idx % 2 ? "green" : ""}">${tag}</span>`).join("");
+      contentRoot.innerHTML = `
+        <h3>基础知识讲解</h3>
+        ${lesson.concept}
+        <h3>实例</h3>
+        <pre class="code">${escapeHtml(lesson.example)}</pre>
+        <h3>实例中的具体内容说明</h3>
+        <div class="explain-list">
+          ${lesson.breakdown.map((row) => `
+            <div class="explain-row"><strong>${escapeHtml(row[0])}</strong><span>${row[1]}</span></div>
+          `).join("")}
+        </div>
+        ${renderQuiz(lesson)}
+      `;
+      renderPractice(lesson);
+      bindQuiz(lesson);
+      renderNav();
+      renderProgress();
+      prevBtn.disabled = current === 0;
+      prevBtn2.disabled = current === 0;
+      nextBtn.disabled = current === lessons.length - 1;
+      nextBtn2.disabled = current === lessons.length - 1;
+      doneBtn.textContent = done.has(current) ? "已完成" : "我理解了";
+    }
+
+    function go(delta) {
+      const next = current + delta;
+      if (next < 0 || next >= lessons.length) return;
+      current = next;
+      save();
+      render();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    prevBtn.addEventListener("click", () => go(-1));
+    prevBtn2.addEventListener("click", () => go(-1));
+    nextBtn.addEventListener("click", () => go(1));
+    nextBtn2.addEventListener("click", () => go(1));
+    doneBtn.addEventListener("click", () => {
+      done.add(current);
+      save();
+      render();
+    });
+    resetBtn.addEventListener("click", () => {
+      if (!confirm("确定重置补充训练进度吗？")) return;
+      done.clear();
+      current = 0;
+      save();
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>

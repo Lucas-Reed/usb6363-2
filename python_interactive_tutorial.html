@@ -1,0 +1,1862 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>4 小时 Python 读码训练营</title>
+  <style>
+    :root {
+      --bg: #f6f7fa;
+      --paper: #ffffff;
+      --ink: #202832;
+      --muted: #667386;
+      --line: #dbe2eb;
+      --soft: #edf2f7;
+      --accent: #1f6f9f;
+      --accent-dark: #15577e;
+      --green: #20815f;
+      --green-soft: #e8f5ef;
+      --red: #b54343;
+      --red-soft: #fff0f0;
+      --yellow: #a96a16;
+      --yellow-soft: #fff5df;
+      --code: #111923;
+      --code-ink: #e8f2f8;
+      --shadow: 0 16px 44px rgba(28, 43, 62, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", Arial, sans-serif;
+      line-height: 1.68;
+    }
+
+    button,
+    textarea {
+      font: inherit;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 310px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      background: #fbfcfe;
+      border-right: 1px solid var(--line);
+      padding: 18px 16px;
+    }
+
+    .brand {
+      padding: 6px 6px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.22;
+      letter-spacing: 0;
+    }
+
+    .brand p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .meter {
+      margin: 16px 6px;
+    }
+
+    .meter-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .meter-track {
+      height: 8px;
+      background: #dfe7ef;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .meter-fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--accent), var(--green));
+      transition: width 0.2s ease;
+    }
+
+    .time-block {
+      margin: 16px 6px;
+      padding: 12px;
+      border-radius: 8px;
+      background: var(--soft);
+      color: #344254;
+      font-size: 13px;
+    }
+
+    .nav {
+      display: grid;
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+    .nav-title {
+      margin: 18px 6px 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .nav-btn {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: var(--ink);
+      display: grid;
+      grid-template-columns: 30px 1fr auto;
+      gap: 8px;
+      align-items: center;
+      text-align: left;
+      padding: 8px;
+      border-radius: 7px;
+      cursor: pointer;
+    }
+
+    .nav-btn:hover {
+      background: var(--soft);
+    }
+
+    .nav-btn.active {
+      background: #dcecf7;
+      color: var(--accent-dark);
+      font-weight: 700;
+    }
+
+    .nav-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #e4ebf2;
+      color: #566579;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .nav-btn.done .nav-num {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .nav-time {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .main {
+      padding: 24px clamp(16px, 4vw, 44px) 48px;
+      min-width: 0;
+    }
+
+    .hero {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .kicker {
+      margin: 0;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .hero h2 {
+      margin: 0;
+      font-size: clamp(26px, 3.2vw, 42px);
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 900px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      background: var(--paper);
+      color: var(--ink);
+      border-radius: 7px;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      border-color: #adc0d1;
+      background: #f8fbff;
+    }
+
+    .btn.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn.green {
+      border-color: var(--green);
+      background: var(--green);
+      color: #fff;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.16fr) minmax(340px, 0.84fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .lesson {
+      padding: clamp(18px, 3vw, 30px);
+    }
+
+    .practice {
+      position: sticky;
+      top: 20px;
+      padding: 18px;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 25px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: #edf5fb;
+      color: #285b7a;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .tag.green {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .lesson h3,
+    .practice h3 {
+      margin: 18px 0 8px;
+      font-size: 21px;
+      line-height: 1.3;
+      letter-spacing: 0;
+    }
+
+    .practice h3 {
+      margin-top: 0;
+      font-size: 18px;
+    }
+
+    .lesson h4 {
+      margin: 15px 0 8px;
+      font-size: 17px;
+      letter-spacing: 0;
+    }
+
+    .lesson p,
+    .lesson li,
+    .practice p {
+      color: #303b49;
+    }
+
+    .lesson ul,
+    .lesson ol {
+      padding-left: 22px;
+    }
+
+    code {
+      font-family: Consolas, "Cascadia Code", "Courier New", monospace;
+      background: #e9eef5;
+      border-radius: 5px;
+      padding: 1px 5px;
+      color: #213245;
+    }
+
+    pre {
+      margin: 12px 0;
+    }
+
+    .code {
+      background: var(--code);
+      color: var(--code-ink);
+      border-radius: 8px;
+      padding: 14px;
+      overflow-x: auto;
+      font-family: Consolas, "Cascadia Code", "Courier New", monospace;
+      font-size: 14px;
+      line-height: 1.55;
+      white-space: pre;
+    }
+
+    .callout {
+      margin: 16px 0;
+      border-left: 4px solid var(--accent);
+      background: #eef7fc;
+      border-radius: 0 7px 7px 0;
+      padding: 12px 14px;
+    }
+
+    .callout.warn {
+      border-left-color: var(--yellow);
+      background: var(--yellow-soft);
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .step {
+      border: 1px solid var(--line);
+      background: #fbfdff;
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .step strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .step span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      overflow: hidden;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+    }
+
+    .mini-table th,
+    .mini-table td {
+      border-bottom: 1px solid var(--line);
+      padding: 9px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .mini-table th {
+      background: #edf2f7;
+    }
+
+    .mini-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .editor {
+      width: 100%;
+      min-height: 190px;
+      resize: vertical;
+      border: 1px solid #b8c6d6;
+      border-radius: 8px;
+      background: var(--code);
+      color: var(--code-ink);
+      padding: 12px;
+      font-family: Consolas, "Cascadia Code", "Courier New", monospace;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .options {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .option {
+      border: 1px solid var(--line);
+      background: #fbfdff;
+      border-radius: 7px;
+      padding: 10px 11px;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .option:hover {
+      border-color: #aebed0;
+    }
+
+    .option.correct {
+      background: var(--green-soft);
+      border-color: #a8d7c3;
+    }
+
+    .option.wrong {
+      background: var(--red-soft);
+      border-color: #e0b0b0;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .feedback,
+    .hint,
+    .answer {
+      border: 1px solid var(--line);
+      background: #f3f6f9;
+      color: #354254;
+      border-radius: 7px;
+      padding: 10px 12px;
+      min-height: 42px;
+    }
+
+    .feedback.good {
+      background: var(--green-soft);
+      border-color: #a8d7c3;
+      color: var(--green);
+    }
+
+    .feedback.bad {
+      background: var(--red-soft);
+      border-color: #e0b0b0;
+      color: var(--red);
+    }
+
+    .hint,
+    .answer {
+      display: none;
+      margin-top: 10px;
+    }
+
+    .footer-nav {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+    }
+
+    .checkpoint {
+      display: grid;
+      gap: 8px;
+      margin: 16px 0;
+    }
+
+    .check-row {
+      display: grid;
+      grid-template-columns: 24px 1fr;
+      gap: 8px;
+      align-items: start;
+    }
+
+    .check-row input {
+      margin-top: 6px;
+    }
+
+    @media (max-width: 1040px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .nav {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .practice {
+        position: static;
+      }
+
+      .steps {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .main {
+        padding: 18px 12px 36px;
+      }
+
+      .nav,
+      .steps {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>4 小时 Python 读码训练营</h1>
+        <p>先用小例子建立语法直觉，最后再回到 USB6363 项目。</p>
+      </div>
+
+      <div class="meter">
+        <div class="meter-row">
+          <span>完成关卡</span>
+          <strong id="progressText">0 / 0</strong>
+        </div>
+        <div class="meter-track" aria-hidden="true">
+          <div class="meter-fill" id="progressFill"></div>
+        </div>
+      </div>
+
+      <div class="time-block">
+        <strong>建议节奏</strong><br>
+        每节 8-12 分钟。先看例子，马上做题；卡住 2 分钟就点提示，别硬耗。
+        <br><br>
+        做完后看补充篇：<a href="python_reading_supplement.html">python_reading_supplement.html</a>
+      </div>
+
+      <div id="navRoot"></div>
+    </aside>
+
+    <main class="main">
+      <section class="hero">
+        <p class="kicker" id="lessonKicker">准备开始</p>
+        <h2 id="lessonTitle">加载中</h2>
+        <p id="lessonGoal"></p>
+        <div class="toolbar">
+          <button class="btn" id="prevBtn" type="button">上一关</button>
+          <button class="btn primary" id="nextBtn" type="button">下一关</button>
+          <button class="btn green" id="doneBtn" type="button">我理解了</button>
+          <button class="btn" id="resetBtn" type="button">重置进度</button>
+        </div>
+      </section>
+
+      <section class="grid">
+        <article class="panel lesson">
+          <div class="tags" id="tagRoot"></div>
+          <div id="contentRoot"></div>
+          <div class="footer-nav">
+            <button class="btn" id="prevBtn2" type="button">上一关</button>
+            <button class="btn primary" id="nextBtn2" type="button">下一关</button>
+          </div>
+        </article>
+
+        <aside class="panel practice">
+          <div id="practiceRoot"></div>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const modules = [
+      { name: "第 0-60 分钟：语法地基", lessons: [0, 1, 2, 3, 4, 5, 6, 7] },
+      { name: "第 60-120 分钟：数据和判断", lessons: [8, 9, 10, 11, 12, 13, 14] },
+      { name: "第 120-180 分钟：函数和工程基础", lessons: [15, 16, 17, 18, 19, 20, 21, 22] },
+      { name: "第 180-240 分钟：对象和项目读码", lessons: [23, 24, 25, 26, 27, 28, 29, 30] }
+    ];
+
+    const lessons = [
+      {
+        title: "怎么用这 4 小时",
+        minutes: 8,
+        tags: ["学习方法", "读码策略"],
+        goal: "知道今天不是背语法，而是建立读代码时的识别能力。",
+        html: `
+          <p>你上午读 Markdown 会累，是因为它一次给了太多知识点。今天换一个训练方式：每一关只学一个动作，马上做一个小题。</p>
+          <div class="steps">
+            <div class="step"><strong>1. 看例子</strong><span>先看能运行的最小片段。</span></div>
+            <div class="step"><strong>2. 猜结果</strong><span>训练眼睛读代码。</span></div>
+            <div class="step"><strong>3. 写 2-6 行</strong><span>只练本节动作。</span></div>
+            <div class="step"><strong>4. 回到项目</strong><span>最后读 USB6363 代码。</span></div>
+          </div>
+          <h3>今天的合理目标</h3>
+          <p>4 小时后，你不需要会写大型程序，但应该能读懂大部分 Python 语法：变量、字符串、列表、字典、条件、循环、函数、类、异常、import、JSON，以及项目里的调用链。</p>
+          <div class="callout">
+            <strong>重要：</strong>前 18 关都不用 6363 项目做例子。项目代码只在后面作为真实读码材料，避免一开始同时学硬件、HTTP、类、异常和类型提示。
+          </div>
+        `,
+        quiz: {
+          prompt: "遇到一个陌生 Python 文件，第一步最好做什么？",
+          options: [
+            ["找入口和主流程，不急着啃每个细节", true],
+            ["从第一行开始把每个库都学完", false],
+            ["先改代码试试能不能跑", false]
+          ],
+          explain: "先看入口和数据流，会比逐行硬啃轻松很多。"
+        },
+        practice: {
+          kind: "checklist",
+          title: "设定今天的练习节奏",
+          task: "勾选后进入下一关。你不是来考试的，是来形成读码肌肉记忆。",
+          items: [
+            "每关最多卡 2 分钟，卡住就看提示。",
+            "先理解小例子，再看项目代码。",
+            "练习答案不唯一，能表达同一个意思就行。"
+          ]
+        }
+      },
+      {
+        title: "程序从上到下执行",
+        minutes: 6,
+        tags: ["顺序执行", "print", "注释"],
+        goal: "理解 Python 默认按顺序执行，注释不会运行。",
+        html: `
+          <p>Python 最基本的规则：从上往下，一行一行执行。</p>
+          <pre class="code">print("start")\nprint("read ai0")\nprint("done")</pre>
+          <p><code>#</code> 后面的内容是注释，给人看，不会执行。</p>
+          <pre class="code"># 这行不会运行\nprint("这行会运行")</pre>
+          <h3>为什么这很重要</h3>
+          <p>读代码时先看顺序。除非遇到 <code>if</code>、<code>for</code>、函数调用、异常等结构，否则 Python 就是从上往下走。</p>
+        `,
+        quiz: {
+          prompt: "下面代码输出几行？\n# print(\"A\")\nprint(\"B\")",
+          options: [["1 行", true], ["2 行", false], ["0 行", false]],
+          explain: "# 后面的 print 是注释，不会执行。"
+        },
+        practice: {
+          kind: "code",
+          title: "写两行输出",
+          task: "写两行 print：第一行输出 start，第二行输出 done。",
+          starter: "",
+          checks: [
+            ["print\\s*\\(\\s*[\"']start[\"']\\s*\\)", "需要 print(\"start\")。"],
+            ["print\\s*\\(\\s*[\"']done[\"']\\s*\\)", "需要 print(\"done\")。"]
+          ],
+          hint: "print 后面是括号，字符串要放在引号里。",
+          answer: "print(\"start\")\nprint(\"done\")"
+        }
+      },
+      {
+        title: "变量：给值起名字",
+        minutes: 7,
+        tags: ["变量", "赋值", "命名"],
+        goal: "能看懂 name = value，并知道右边先算，左边保存。",
+        html: `
+          <p>变量是给一个值起名字。等号不是数学里的“永远相等”，而是“把右边的值放进左边的名字”。</p>
+          <pre class="code">channel = "ai0"\nsamples = 1\nvoltage = 1.23</pre>
+          <p>变量可以重新赋值：</p>
+          <pre class="code">value = 1\nvalue = value + 1\nprint(value)  # 2</pre>
+          <table class="mini-table">
+            <tr><th>写法</th><th>意思</th></tr>
+            <tr><td><code>x = 10</code></td><td>把 10 保存到 x。</td></tr>
+            <tr><td><code>x = x + 1</code></td><td>先取旧 x，加 1，再存回 x。</td></tr>
+            <tr><td><code>channel_name</code></td><td>多个单词常用下划线。</td></tr>
+          </table>
+        `,
+        quiz: {
+          prompt: "执行后 x 是多少？\nx = 3\nx = x + 2",
+          options: [["5", true], ["3", false], ["x + 2", false]],
+          explain: "第二行先取旧的 x，也就是 3，再加 2。"
+        },
+        practice: {
+          kind: "code",
+          title: "保存一个通道名",
+          task: "定义 channel 为 ai0，定义 samples 为 10，然后打印 channel。",
+          starter: "",
+          checks: [
+            ["channel\\s*=\\s*[\"']ai0[\"']", "需要 channel = \"ai0\"。"],
+            ["samples\\s*=\\s*10", "需要 samples = 10。"],
+            ["print\\s*\\(\\s*channel\\s*\\)", "需要 print(channel)。"]
+          ],
+          hint: "字符串 ai0 要加引号，数字 10 不需要。",
+          answer: "channel = \"ai0\"\nsamples = 10\nprint(channel)"
+        }
+      },
+      {
+        title: "数字：int、float 和运算",
+        minutes: 7,
+        tags: ["int", "float", "运算"],
+        goal: "分清整数、小数和常见运算符。",
+        html: `
+          <p>Python 里常见数字有两类：<code>int</code> 是整数，<code>float</code> 是小数。</p>
+          <pre class="code">samples = 100      # int\nrate = 1000.0      # float\nseconds = samples / rate</pre>
+          <table class="mini-table">
+            <tr><th>运算符</th><th>意思</th><th>例子</th></tr>
+            <tr><td><code>+</code></td><td>加</td><td><code>1 + 2</code></td></tr>
+            <tr><td><code>-</code></td><td>减</td><td><code>5 - 3</code></td></tr>
+            <tr><td><code>*</code></td><td>乘</td><td><code>2 * 4</code></td></tr>
+            <tr><td><code>/</code></td><td>除，结果通常是小数</td><td><code>5 / 2</code> 得到 <code>2.5</code></td></tr>
+          </table>
+          <div class="callout">读硬件代码时，采样率、电压、超时时间通常是 float；采样点数通常是 int。</div>
+        `,
+        quiz: {
+          prompt: "samples = 100\nrate = 1000.0\nseconds = samples / rate\nseconds 是多少？",
+          options: [["0.1", true], ["10", false], ["100000", false]],
+          explain: "100 / 1000.0 = 0.1。"
+        },
+        practice: {
+          kind: "code",
+          title: "计算采样时长",
+          task: "定义 samples = 500，rate = 1000.0，计算 seconds = samples / rate。",
+          starter: "",
+          checks: [
+            ["samples\\s*=\\s*500", "需要 samples = 500。"],
+            ["rate\\s*=\\s*1000\\.0", "需要 rate = 1000.0。"],
+            ["seconds\\s*=\\s*samples\\s*/\\s*rate", "需要 seconds = samples / rate。"]
+          ],
+          hint: "先保存两个变量，再用它们相除。",
+          answer: "samples = 500\nrate = 1000.0\nseconds = samples / rate"
+        }
+      },
+      {
+        title: "字符串：文本和方法",
+        minutes: 7,
+        tags: ["str", "方法", "清洗输入"],
+        goal: "知道字符串是文本，并能看懂 strip、upper、lower、rstrip。",
+        html: `
+          <p>字符串就是文本，用引号包起来。</p>
+          <pre class="code">channel = "ai0"\nline = "PFI0"\nbase_url = "http://127.0.0.1:8765"</pre>
+          <p>字符串有很多方法。方法就是跟在值后面的动作。</p>
+          <pre class="code">name = "  rising  "\nkey = name.strip().upper()\nprint(key)  # RISING</pre>
+          <table class="mini-table">
+            <tr><th>方法</th><th>作用</th></tr>
+            <tr><td><code>strip()</code></td><td>去掉两边空白。</td></tr>
+            <tr><td><code>upper()</code></td><td>转大写。</td></tr>
+            <tr><td><code>lower()</code></td><td>转小写。</td></tr>
+            <tr><td><code>rstrip("/")</code></td><td>去掉右边的斜杠。</td></tr>
+          </table>
+        `,
+        quiz: {
+          prompt: "name = \"  pfi0  \"\nname.strip().upper() 的结果是？",
+          options: [["PFI0", true], ["  PFI0  ", false], ["pfi0", false]],
+          explain: "strip 去空格，upper 转大写。"
+        },
+        practice: {
+          kind: "code",
+          title: "统一边沿名字",
+          task: "把 edge = \" rising \" 处理成大写的 key。",
+          starter: "edge = \" rising \"\n",
+          checks: [
+            ["key\\s*=\\s*edge\\.strip\\(\\)\\.upper\\(\\)", "需要 key = edge.strip().upper()。"]
+          ],
+          hint: "先 strip，再 upper，可以链式调用。",
+          answer: "edge = \" rising \"\nkey = edge.strip().upper()"
+        }
+      },
+      {
+        title: "f-string：把变量放进文本",
+        minutes: 7,
+        tags: ["f-string", "格式化", "输出"],
+        goal: "能看懂并写出 f\"...{变量}...\"。",
+        html: `
+          <p>f-string 是最常用的字符串格式化方式。字符串前面加 <code>f</code>，大括号里放变量。</p>
+          <pre class="code">channel = "ai0"\nvalue = 1.23456\nprint(f"{channel} = {value:.3f} V")\n# ai0 = 1.235 V</pre>
+          <p><code>{value:.3f}</code> 表示把小数保留 3 位。项目里打印电压时经常这样写。</p>
+          <div class="callout">读代码时看到 <code>f"...{...}..."</code>，先把它理解成“把变量拼进一句话”。</div>
+        `,
+        quiz: {
+          prompt: "value = 1.23456\nf\"{value:.2f}\" 的结果更接近哪个？",
+          options: [["1.23", true], ["1.23456", false], ["value", false]],
+          explain: ".2f 表示保留 2 位小数。"
+        },
+        practice: {
+          kind: "code",
+          title: "打印电压",
+          task: "定义 value = 2.3456，用 f-string 打印 voltage = 2.35 V。",
+          starter: "",
+          checks: [
+            ["value\\s*=\\s*2\\.3456", "需要 value = 2.3456。"],
+            ["print\\s*\\(\\s*f[\"'][^\"']*\\{value:\\.2f\\}[^\"']*V[^\"']*[\"']\\s*\\)", "需要用 f-string 和 {value:.2f}。"]
+          ],
+          hint: "写法类似 print(f\"voltage = {value:.2f} V\")。",
+          answer: "value = 2.3456\nprint(f\"voltage = {value:.2f} V\")"
+        }
+      },
+      {
+        title: "布尔值和比较",
+        minutes: 7,
+        tags: ["bool", "比较", "True/False"],
+        goal: "理解 True、False 和比较表达式。",
+        html: `
+          <p>布尔值只有两个：<code>True</code> 和 <code>False</code>。注意首字母大写。</p>
+          <pre class="code">voltage = 1.2\nis_high = voltage > 1.0\nprint(is_high)  # True</pre>
+          <table class="mini-table">
+            <tr><th>比较</th><th>意思</th></tr>
+            <tr><td><code>==</code></td><td>是否相等。</td></tr>
+            <tr><td><code>!=</code></td><td>是否不相等。</td></tr>
+            <tr><td><code>&gt;</code> / <code>&lt;</code></td><td>大于 / 小于。</td></tr>
+            <tr><td><code>&gt;=</code> / <code>&lt;=</code></td><td>大于等于 / 小于等于。</td></tr>
+          </table>
+          <p><code>=</code> 是赋值，<code>==</code> 才是比较是否相等。</p>
+        `,
+        quiz: {
+          prompt: "x = 3\nx == 3 的结果是？",
+          options: [["True", true], ["False", false], ["3", false]],
+          explain: "== 比较左右是否相等。"
+        },
+        practice: {
+          kind: "code",
+          title: "判断电压是否超限",
+          task: "定义 voltage = 2.0，定义 is_high = voltage > 1.0。",
+          starter: "",
+          checks: [
+            ["voltage\\s*=\\s*2\\.0", "需要 voltage = 2.0。"],
+            ["is_high\\s*=\\s*voltage\\s*>\\s*1\\.0", "需要 is_high = voltage > 1.0。"]
+          ],
+          hint: "比较表达式本身会得到 True 或 False。",
+          answer: "voltage = 2.0\nis_high = voltage > 1.0"
+        }
+      },
+      {
+        title: "if：让程序分岔",
+        minutes: 9,
+        tags: ["if", "else", "缩进"],
+        goal: "理解条件判断和缩进代码块。",
+        html: `
+          <p><code>if</code> 根据真假决定走哪条路。Python 用缩进表示代码块。</p>
+          <pre class="code">voltage = 1.2\n\nif voltage > 1.0:\n    print("high")\nelse:\n    print("normal")</pre>
+          <p>冒号后面，下一行必须缩进。缩进里的代码属于这个分支。</p>
+          <div class="callout warn">
+            <strong>最常见错误：</strong>忘记冒号，或者缩进不一致。Python 对缩进很认真。
+          </div>
+        `,
+        quiz: {
+          prompt: "voltage = 0.5\nif voltage > 1.0:\n    print(\"high\")\nelse:\n    print(\"normal\")\n输出是什么？",
+          options: [["normal", true], ["high", false], ["什么都不输出", false]],
+          explain: "0.5 不大于 1.0，所以走 else。"
+        },
+        practice: {
+          kind: "code",
+          title: "写一个阈值判断",
+          task: "如果 voltage > 1.0，打印 high，否则打印 normal。",
+          starter: "voltage = 0.8\n\n",
+          checks: [
+            ["if\\s+voltage\\s*>\\s*1\\.0\\s*:", "需要 if voltage > 1.0:。"],
+            ["print\\s*\\(\\s*[\"']high[\"']\\s*\\)", "需要打印 high。"],
+            ["else\\s*:", "需要 else:。"],
+            ["print\\s*\\(\\s*[\"']normal[\"']\\s*\\)", "需要打印 normal。"]
+          ],
+          hint: "if 和 else 后面都有冒号；分支内容缩进 4 个空格。",
+          answer: "voltage = 0.8\n\nif voltage > 1.0:\n    print(\"high\")\nelse:\n    print(\"normal\")"
+        }
+      },
+      {
+        title: "None 和真假判断",
+        minutes: 6,
+        tags: ["None", "truthy", "falsy"],
+        goal: "看懂 None、if value 和 if not value。",
+        html: `
+          <p><code>None</code> 表示“没有值”。它不是 0，也不是空字符串，而是一个专门的空值。</p>
+          <pre class="code">params = None\n\nif params is None:\n    print("no params")</pre>
+          <p>Python 里很多值可以直接放进 <code>if</code> 判断：</p>
+          <table class="mini-table">
+            <tr><th>偏假</th><th>偏真</th></tr>
+            <tr><td><code>False</code>、<code>None</code>、<code>0</code>、<code>""</code>、<code>[]</code>、<code>{}</code></td><td>非空字符串、非空列表、非零数字、<code>True</code></td></tr>
+          </table>
+          <pre class="code">values = []\nif not values:\n    print("empty")</pre>
+        `,
+        quiz: {
+          prompt: "values = []\nif not values:\n    print(\"empty\")\n会不会打印？",
+          options: [["会", true], ["不会", false]],
+          explain: "空列表在条件判断里偏假，not values 为 True。"
+        },
+        practice: {
+          kind: "code",
+          title: "判断没有参数",
+          task: "定义 params = None，如果 params is None，就打印 no params。",
+          starter: "",
+          checks: [
+            ["params\\s*=\\s*None", "需要 params = None。"],
+            ["if\\s+params\\s+is\\s+None\\s*:", "需要 if params is None:。"],
+            ["print\\s*\\(\\s*[\"']no params[\"']\\s*\\)", "需要打印 no params。"]
+          ],
+          hint: "判断 None 推荐用 is None。",
+          answer: "params = None\nif params is None:\n    print(\"no params\")"
+        }
+      },
+      {
+        title: "list：一串值",
+        minutes: 7,
+        tags: ["list", "索引", "append"],
+        goal: "理解列表、索引和追加元素。",
+        html: `
+          <p>列表是一串值，用方括号。</p>
+          <pre class="code">channels = ["ai0", "ai1", "ai2"]\nprint(channels[0])  # ai0\nprint(channels[1])  # ai1</pre>
+          <p>Python 从 0 开始计数。列表可以追加元素：</p>
+          <pre class="code">values = []\nvalues.append(1.2)\nvalues.append(1.3)\nprint(values)  # [1.2, 1.3]</pre>
+        `,
+        quiz: {
+          prompt: "channels = [\"ai0\", \"ai1\", \"ai2\"]\nchannels[2] 是？",
+          options: [["ai2", true], ["ai1", false], ["报错", false]],
+          explain: "索引从 0 开始，0 是 ai0，1 是 ai1，2 是 ai2。"
+        },
+        practice: {
+          kind: "code",
+          title: "创建通道列表",
+          task: "创建 channels = [\"ai0\", \"ai1\"]，然后 append \"ai2\"。",
+          starter: "",
+          checks: [
+            ["channels\\s*=\\s*\\[\\s*[\"']ai0[\"']\\s*,\\s*[\"']ai1[\"']\\s*\\]", "需要创建包含 ai0 和 ai1 的列表。"],
+            ["channels\\.append\\s*\\(\\s*[\"']ai2[\"']\\s*\\)", "需要 channels.append(\"ai2\")。"]
+          ],
+          hint: "列表用 []，append 是列表的方法。",
+          answer: "channels = [\"ai0\", \"ai1\"]\nchannels.append(\"ai2\")"
+        }
+      },
+      {
+        title: "dict：带名字的数据",
+        minutes: 9,
+        tags: ["dict", "key", "get"],
+        goal: "能读写字典，理解 result[\"values\"] 和 body.get。",
+        html: `
+          <p>字典是一组“键 -> 值”。项目里的 API 返回值大量使用字典。</p>
+          <pre class="code">result = {\n    "channel": "Dev2/ai0",\n    "values": 1.23,\n    "ok": True,\n}\n\nprint(result["values"])</pre>
+          <h3>两种取值方式</h3>
+          <table class="mini-table">
+            <tr><th>写法</th><th>适合场景</th></tr>
+            <tr><td><code>result["values"]</code></td><td>这个键必须存在，不存在就报错。</td></tr>
+            <tr><td><code>body.get("channel", "ao0")</code></td><td>这个键可选，不存在就用默认值。</td></tr>
+          </table>
+        `,
+        quiz: {
+          prompt: "body = {}\nbody.get(\"channel\", \"ao0\") 得到什么？",
+          options: [["ao0", true], ["None", false], ["报错", false]],
+          explain: "get 的第二个参数是默认值。"
+        },
+        practice: {
+          kind: "code",
+          title: "从结果里取值",
+          task: "给定 result，取 values 保存到 voltage，取 channel 保存到 channel。",
+          starter: "result = {\"channel\": \"Dev2/ai0\", \"values\": 1.23}\n",
+          checks: [
+            ["voltage\\s*=\\s*result\\s*\\[\\s*[\"']values[\"']\\s*\\]", "需要 voltage = result[\"values\"]。"],
+            ["channel\\s*=\\s*result\\s*\\[\\s*[\"']channel[\"']\\s*\\]", "需要 channel = result[\"channel\"]。"]
+          ],
+          hint: "字典用方括号加键名取值。",
+          answer: "result = {\"channel\": \"Dev2/ai0\", \"values\": 1.23}\nvoltage = result[\"values\"]\nchannel = result[\"channel\"]"
+        }
+      },
+      {
+        title: "类型转换",
+        minutes: 7,
+        tags: ["int", "float", "str", "bool"],
+        goal: "看懂 HTTP 参数为什么要 int(...) 和 float(...)。",
+        html: `
+          <p>外部输入常常是字符串。要做数学运算，就需要转换类型。</p>
+          <pre class="code">samples_text = "100"\nrate_text = "1000.0"\n\nsamples = int(samples_text)\nrate = float(rate_text)\nseconds = samples / rate</pre>
+          <table class="mini-table">
+            <tr><th>函数</th><th>作用</th></tr>
+            <tr><td><code>int("100")</code></td><td>转整数。</td></tr>
+            <tr><td><code>float("1.23")</code></td><td>转小数。</td></tr>
+            <tr><td><code>str(123)</code></td><td>转字符串。</td></tr>
+            <tr><td><code>bool(value)</code></td><td>按真假规则转布尔值。</td></tr>
+          </table>
+          <div class="callout">服务器里解析 URL 参数时，<code>?samples=100</code> 读进来通常是字符串，所以要转成 int。</div>
+        `,
+        quiz: {
+          prompt: "int(\"12\") + 1 的结果是？",
+          options: [["13", true], ["121", false], ["报错", false]],
+          explain: "int(\"12\") 先变成整数 12，再加 1。"
+        },
+        practice: {
+          kind: "code",
+          title: "转换 URL 参数",
+          task: "把 samples_text = \"200\" 转成 int，rate_text = \"1000.0\" 转成 float。",
+          starter: "samples_text = \"200\"\nrate_text = \"1000.0\"\n",
+          checks: [
+            ["samples\\s*=\\s*int\\s*\\(\\s*samples_text\\s*\\)", "需要 samples = int(samples_text)。"],
+            ["rate\\s*=\\s*float\\s*\\(\\s*rate_text\\s*\\)", "需要 rate = float(rate_text)。"]
+          ],
+          hint: "int 和 float 都是函数，参数放括号里。",
+          answer: "samples_text = \"200\"\nrate_text = \"1000.0\"\nsamples = int(samples_text)\nrate = float(rate_text)"
+        }
+      },
+      {
+        title: "for：对每一项做事",
+        minutes: 9,
+        tags: ["for", "遍历", "range"],
+        goal: "看懂 for item in items 和 range。",
+        html: `
+          <p><code>for</code> 用来遍历一串东西。</p>
+          <pre class="code">channels = ["ai0", "ai1", "ai2"]\n\nfor channel in channels:\n    print(channel)</pre>
+          <p><code>range(3)</code> 会产生 0、1、2，常用于重复固定次数。</p>
+          <pre class="code">for i in range(3):\n    print(i)</pre>
+          <p>循环变量名可以自己取，但要能表达意思。比如 <code>for device in devices</code> 就很自然。</p>
+        `,
+        quiz: {
+          prompt: "for i in range(3): print(i) 会输出哪些数？",
+          options: [["0、1、2", true], ["1、2、3", false], ["3", false]],
+          explain: "range(3) 从 0 到 2，不包含 3。"
+        },
+        practice: {
+          kind: "code",
+          title: "打印所有通道",
+          task: "遍历 channels，逐个 print(channel)。",
+          starter: "channels = [\"ai0\", \"ai1\", \"ai2\"]\n\n",
+          checks: [
+            ["for\\s+channel\\s+in\\s+channels\\s*:", "需要 for channel in channels:。"],
+            ["print\\s*\\(\\s*channel\\s*\\)", "需要 print(channel)。"]
+          ],
+          hint: "for 后面要冒号，循环体要缩进。",
+          answer: "channels = [\"ai0\", \"ai1\", \"ai2\"]\n\nfor channel in channels:\n    print(channel)"
+        }
+      },
+      {
+        title: "for + if：筛选数据",
+        minutes: 8,
+        tags: ["循环", "筛选", "in"],
+        goal: "理解从一堆值里挑出需要的值。",
+        html: `
+          <p>循环和条件常常一起用：对每一项检查，如果满足条件，就保存或处理。</p>
+          <pre class="code">terminals = ["/Dev2/PFI0", "/Dev2/ai0", "/Dev2/PFI1"]\npfi = []\n\nfor terminal in terminals:\n    if "/PFI" in terminal:\n        pfi.append(terminal)</pre>
+          <p><code>"/PFI" in terminal</code> 表示字符串 terminal 里是否包含 <code>"/PFI"</code>。</p>
+          <div class="callout">这就是读设备端子列表时最常见的思路：列出全部，再筛选 PFI、数字线、计数器。</div>
+        `,
+        quiz: {
+          prompt: "\"PFI\" in \"Dev2/PFI0\" 的结果是？",
+          options: [["True", true], ["False", false], ["PFI0", false]],
+          explain: "左边字符串确实包含在右边字符串里。"
+        },
+        practice: {
+          kind: "code",
+          title: "筛选 PFI",
+          task: "用 for 和 if 从 terminals 中筛选包含 /PFI 的项，放进 pfi。",
+          starter: "terminals = [\"/Dev2/PFI0\", \"/Dev2/ai0\", \"/Dev2/PFI1\"]\npfi = []\n\n",
+          checks: [
+            ["for\\s+terminal\\s+in\\s+terminals\\s*:", "需要 for terminal in terminals:。"],
+            ["if\\s+[\"']/PFI[\"']\\s+in\\s+terminal\\s*:", "需要 if \"/PFI\" in terminal:。"],
+            ["pfi\\.append\\s*\\(\\s*terminal\\s*\\)", "需要 pfi.append(terminal)。"]
+          ],
+          hint: "先建空列表 pfi，再循环 append。",
+          answer: "terminals = [\"/Dev2/PFI0\", \"/Dev2/ai0\", \"/Dev2/PFI1\"]\npfi = []\n\nfor terminal in terminals:\n    if \"/PFI\" in terminal:\n        pfi.append(terminal)"
+        }
+      },
+      {
+        title: "列表推导式：筛选的简写",
+        minutes: 7,
+        tags: ["列表推导式", "简写", "读码"],
+        goal: "先能读懂列表推导式，不要求立刻熟练写。",
+        html: `
+          <p>列表推导式是很多 Python 代码里会出现的简写。它把“创建空列表、循环、append”合成一行。</p>
+          <pre class="code">pfi = [terminal for terminal in terminals if "/PFI" in terminal]</pre>
+          <p>读的时候按这个模板拆：</p>
+          <pre class="code">[结果 for 临时变量 in 原列表 if 条件]</pre>
+          <p>等价于：</p>
+          <pre class="code">pfi = []\nfor terminal in terminals:\n    if "/PFI" in terminal:\n        pfi.append(terminal)</pre>
+        `,
+        quiz: {
+          prompt: "[x for x in numbers if x > 0] 是什么？",
+          options: [["挑出大于 0 的数字组成新列表", true], ["把 numbers 全部清空", false], ["只取第一个数字", false]],
+          explain: "推导式会生成一个新列表，不会自动清空原列表。"
+        },
+        practice: {
+          kind: "code",
+          title: "写一行推导式",
+          task: "把 terminals 中包含 /PFI 的项筛选到 pfi。",
+          starter: "terminals = [\"/Dev2/PFI0\", \"/Dev2/ai0\", \"/Dev2/PFI1\"]\n",
+          checks: [
+            ["pfi\\s*=\\s*\\[\\s*terminal\\s+for\\s+terminal\\s+in\\s+terminals\\s+if\\s+[\"']/PFI[\"']\\s+in\\s+terminal\\s*\\]", "需要写标准列表推导式。"]
+          ],
+          hint: "照模板：[terminal for terminal in terminals if \"/PFI\" in terminal]。",
+          answer: "terminals = [\"/Dev2/PFI0\", \"/Dev2/ai0\", \"/Dev2/PFI1\"]\npfi = [terminal for terminal in terminals if \"/PFI\" in terminal]"
+        }
+      },
+      {
+        title: "函数：把动作封装起来",
+        minutes: 9,
+        tags: ["def", "参数", "return"],
+        goal: "理解函数名、参数、返回值。",
+        html: `
+          <p>函数是把一段动作起名字。读函数时先看函数头和 return。</p>
+          <pre class="code">def add_one(x):\n    result = x + 1\n    return result\n\nvalue = add_one(3)\nprint(value)  # 4</pre>
+          <table class="mini-table">
+            <tr><th>部分</th><th>含义</th></tr>
+            <tr><td><code>def add_one(x):</code></td><td>定义函数，x 是参数。</td></tr>
+            <tr><td><code>return result</code></td><td>把结果交给调用者。</td></tr>
+            <tr><td><code>add_one(3)</code></td><td>调用函数，把 3 传给 x。</td></tr>
+          </table>
+        `,
+        quiz: {
+          prompt: "def double(x):\n    return x * 2\n\ndouble(4) 得到？",
+          options: [["8", true], ["4", false], ["double", false]],
+          explain: "调用时 x 是 4，返回 4 * 2。"
+        },
+        practice: {
+          kind: "code",
+          title: "写一个换算函数",
+          task: "定义 seconds(samples, rate)，返回 samples / rate。",
+          starter: "",
+          checks: [
+            ["def\\s+seconds\\s*\\(\\s*samples\\s*,\\s*rate\\s*\\)\\s*:", "需要 def seconds(samples, rate):。"],
+            ["return\\s+samples\\s*/\\s*rate", "需要 return samples / rate。"]
+          ],
+          hint: "函数体要缩进。",
+          answer: "def seconds(samples, rate):\n    return samples / rate"
+        }
+      },
+      {
+        title: "默认参数和关键字参数",
+        minutes: 8,
+        tags: ["默认值", "关键字参数", "API"],
+        goal: "看懂 channel='ai0'、samples=1 这类写法。",
+        html: `
+          <p>函数参数可以有默认值。调用时不传，就用默认值。</p>
+          <pre class="code">def read_ai(channel="ai0", samples=1):\n    print(channel, samples)\n\nread_ai()\nread_ai(channel="ai1", samples=100)</pre>
+          <p><code>channel="ai1"</code> 这种调用方式叫关键字参数。优点是清楚，不容易写错顺序。</p>
+          <div class="callout">项目里的 <code>daq.read_ai(channel="ai0", samples=100, rate=1000)</code> 就是典型关键字参数。</div>
+        `,
+        quiz: {
+          prompt: "def read_ai(channel=\"ai0\")\n调用 read_ai() 时 channel 是？",
+          options: [["ai0", true], ["None", false], ["报错", false]],
+          explain: "不传参数时使用默认值。"
+        },
+        practice: {
+          kind: "code",
+          title: "写带默认值的函数",
+          task: "定义 read_line(line=\"PFI0\")，打印 line。",
+          starter: "",
+          checks: [
+            ["def\\s+read_line\\s*\\(\\s*line\\s*=\\s*[\"']PFI0[\"']\\s*\\)\\s*:", "需要 def read_line(line=\"PFI0\"):。"],
+            ["print\\s*\\(\\s*line\\s*\\)", "需要 print(line)。"]
+          ],
+          hint: "默认值写在参数名后面。",
+          answer: "def read_line(line=\"PFI0\"):\n    print(line)"
+        }
+      },
+      {
+        title: "函数里的局部变量",
+        minutes: 6,
+        tags: ["作用域", "局部变量", "return"],
+        goal: "知道函数内部变量通常只在函数内部使用。",
+        html: `
+          <p>函数里面定义的变量，一般叫局部变量。它们服务于这个函数。</p>
+          <pre class="code">def normalize(channel):\n    physical = \"Dev2/\" + channel\n    return physical\n\nname = normalize(\"ai0\")</pre>
+          <p><code>physical</code> 是函数内部临时变量。调用者拿到的是 <code>return</code> 出来的结果。</p>
+          <p>读函数时，不要被中间变量吓到。先找输入参数，再找 return。</p>
+        `,
+        quiz: {
+          prompt: "函数把结果交给外面，主要靠哪个关键字？",
+          options: [["return", true], ["print", false], ["import", false]],
+          explain: "print 是显示给人看，return 是交给调用者继续用。"
+        },
+        practice: {
+          kind: "code",
+          title: "返回完整通道名",
+          task: "定义 normalize(channel)，内部生成 physical = \"Dev2/\" + channel，并 return physical。",
+          starter: "",
+          checks: [
+            ["def\\s+normalize\\s*\\(\\s*channel\\s*\\)\\s*:", "需要 def normalize(channel):。"],
+            ["physical\\s*=\\s*[\"']Dev2/[\"']\\s*\\+\\s*channel", "需要拼出 physical。"],
+            ["return\\s+physical", "需要 return physical。"]
+          ],
+          hint: "字符串可以用 + 拼接。",
+          answer: "def normalize(channel):\n    physical = \"Dev2/\" + channel\n    return physical"
+        }
+      },
+      {
+        title: "raise 和参数检查",
+        minutes: 7,
+        tags: ["raise", "ValueError", "防错"],
+        goal: "理解为什么代码会主动报错。",
+        html: `
+          <p>好代码会尽早拒绝明显不合法的输入。<code>raise</code> 表示主动抛出错误。</p>
+          <pre class="code">def check_samples(samples):\n    if samples < 1:\n        raise ValueError(\"samples must be >= 1\")\n    return samples</pre>
+          <p>这不是程序坏了，而是在保护后面的逻辑。比如采样点数不能是 0。</p>
+          <table class="mini-table">
+            <tr><th>错误类型</th><th>常见含义</th></tr>
+            <tr><td><code>ValueError</code></td><td>参数值不合法。</td></tr>
+            <tr><td><code>RuntimeError</code></td><td>运行状态不对，比如找不到设备。</td></tr>
+          </table>
+        `,
+        quiz: {
+          prompt: "if samples < 1: raise ValueError(...) 的目的是什么？",
+          options: [["尽早阻止不合法参数", true], ["让程序变慢", false], ["忽略错误", false]],
+          explain: "参数检查能避免错误进入更深层代码。"
+        },
+        practice: {
+          kind: "code",
+          title: "检查 rate",
+          task: "定义 check_rate(rate)，如果 rate <= 0 就 raise ValueError，否则 return rate。",
+          starter: "",
+          checks: [
+            ["def\\s+check_rate\\s*\\(\\s*rate\\s*\\)\\s*:", "需要 def check_rate(rate):。"],
+            ["if\\s+rate\\s*<=\\s*0\\s*:", "需要 if rate <= 0:。"],
+            ["raise\\s+ValueError\\s*\\(", "需要 raise ValueError(...)。"],
+            ["return\\s+rate", "需要 return rate。"]
+          ],
+          hint: "raise 后面通常跟错误类型和错误信息。",
+          answer: "def check_rate(rate):\n    if rate <= 0:\n        raise ValueError(\"rate must be > 0\")\n    return rate"
+        }
+      },
+      {
+        title: "try/except：把错误变成可处理结果",
+        minutes: 7,
+        tags: ["try", "except", "错误处理"],
+        goal: "看懂服务器为什么捕获异常并返回错误信息。",
+        html: `
+          <p><code>try</code> 里放可能失败的代码，<code>except</code> 里处理失败。</p>
+          <pre class="code">try:\n    value = float(\"abc\")\nexcept ValueError as exc:\n    print(f\"bad value: {exc}\")</pre>
+          <p>项目服务器里会捕获错误，然后返回 JSON 错误，而不是让服务直接崩掉。</p>
+          <pre class="code">try:\n    self._send_json(controller.read_ai_voltage(...))\nexcept Exception as exc:\n    self._send_error(HTTPStatus.BAD_REQUEST, str(exc))</pre>
+        `,
+        quiz: {
+          prompt: "try/except 的主要作用是？",
+          options: [["处理可能发生的错误", true], ["定义变量", false], ["创建列表", false]],
+          explain: "它让程序能对错误做出可控反应。"
+        },
+        practice: {
+          kind: "code",
+          title: "捕获转换错误",
+          task: "用 try 把 text 转成 float；如果 ValueError，打印 bad number。",
+          starter: "text = \"abc\"\n\n",
+          checks: [
+            ["try\\s*:", "需要 try:。"],
+            ["value\\s*=\\s*float\\s*\\(\\s*text\\s*\\)", "需要 value = float(text)。"],
+            ["except\\s+ValueError", "需要 except ValueError。"],
+            ["print\\s*\\(\\s*[\"']bad number[\"']\\s*\\)", "需要打印 bad number。"]
+          ],
+          hint: "try 和 except 都要冒号，下面都要缩进。",
+          answer: "text = \"abc\"\n\ntry:\n    value = float(text)\nexcept ValueError:\n    print(\"bad number\")"
+        }
+      },
+      {
+        title: "import：使用别的模块",
+        minutes: 7,
+        tags: ["import", "模块", "标准库"],
+        goal: "看懂 import json 和 from xxx import yyy。",
+        html: `
+          <p>一个 <code>.py</code> 文件就是一个模块。<code>import</code> 表示拿来别处的工具。</p>
+          <pre class="code">import json\n\ntext = json.dumps({\"value\": 1.23})</pre>
+          <p>也可以只导入某个名字：</p>
+          <pre class="code">from usb6363_client import Usb6363Client\n\ndaq = Usb6363Client()</pre>
+          <table class="mini-table">
+            <tr><th>写法</th><th>使用方式</th></tr>
+            <tr><td><code>import json</code></td><td><code>json.dumps(...)</code></td></tr>
+            <tr><td><code>from x import Y</code></td><td><code>Y(...)</code></td></tr>
+          </table>
+        `,
+        quiz: {
+          prompt: "写了 import json 后，调用 dumps 应该怎么写？",
+          options: [["json.dumps(data)", true], ["dumps(data)", false], ["import.dumps(data)", false]],
+          explain: "导入整个模块后，要通过模块名访问里面的函数。"
+        },
+        practice: {
+          kind: "code",
+          title: "导入客户端",
+          task: "写一行：从 usb6363_client 导入 Usb6363Client。",
+          starter: "",
+          checks: [
+            ["from\\s+usb6363_client\\s+import\\s+Usb6363Client", "需要 from usb6363_client import Usb6363Client。"]
+          ],
+          hint: "from 模块名 import 名字。",
+          answer: "from usb6363_client import Usb6363Client"
+        }
+      },
+      {
+        title: "JSON：Python 数据和网络数据",
+        minutes: 7,
+        tags: ["json", "dict", "API"],
+        goal: "知道 dumps 和 loads 的方向。",
+        html: `
+          <p>JSON 是网络里常用的数据格式，长得很像 Python 字典，但它是文本。</p>
+          <pre class="code">import json\n\ndata = {\"channel\": \"ao0\", \"value\": 1.23}\ntext = json.dumps(data)\nback = json.loads(text)</pre>
+          <table class="mini-table">
+            <tr><th>函数</th><th>方向</th></tr>
+            <tr><td><code>json.dumps(data)</code></td><td>Python 数据 -> JSON 字符串。</td></tr>
+            <tr><td><code>json.loads(text)</code></td><td>JSON 字符串 -> Python 数据。</td></tr>
+          </table>
+          <div class="callout">客户端发 POST 时会 dumps，客户端收到响应时会 loads。</div>
+        `,
+        quiz: {
+          prompt: "json.loads(text) 是什么方向？",
+          options: [["JSON 字符串 -> Python 数据", true], ["Python 数据 -> JSON 字符串", false], ["启动 HTTP 服务", false]],
+          explain: "loads 可以记成 load string，从字符串加载 JSON。"
+        },
+        practice: {
+          kind: "code",
+          title: "把 AO 请求变成 JSON",
+          task: "定义 data = {\"channel\": \"ao0\", \"value\": 1.23}，再 text = json.dumps(data)。",
+          starter: "import json\n\n",
+          checks: [
+            ["data\\s*=\\s*\\{[^}]*[\"']channel[\"']\\s*:\\s*[\"']ao0[\"'][^}]*[\"']value[\"']\\s*:\\s*1\\.23[^}]*\\}", "需要 data 字典包含 channel 和 value。"],
+            ["text\\s*=\\s*json\\.dumps\\s*\\(\\s*data\\s*\\)", "需要 text = json.dumps(data)。"]
+          ],
+          hint: "字典用花括号，键和值之间用冒号。",
+          answer: "import json\n\ndata = {\"channel\": \"ao0\", \"value\": 1.23}\ntext = json.dumps(data)"
+        }
+      },
+      {
+        title: "with：自动收尾",
+        minutes: 6,
+        tags: ["with", "资源", "上下文"],
+        goal: "理解 with 管理需要释放的资源。",
+        html: `
+          <p><code>with</code> 用于进入一段需要收尾的上下文，离开后自动清理。</p>
+          <pre class="code">with open(\"data.txt\", \"r\", encoding=\"utf-8\") as file:\n    text = file.read()</pre>
+          <p>在硬件代码里也常见：</p>
+          <pre class="code">with nidaqmx.Task() as task:\n    value = task.read()</pre>
+          <p>含义是：创建任务，做事，结束后释放任务。</p>
+        `,
+        quiz: {
+          prompt: "with 最核心的好处是？",
+          options: [["离开代码块时自动收尾", true], ["让代码不需要缩进", false], ["让所有错误消失", false]],
+          explain: "with 常用于文件、锁、网络响应、硬件任务。"
+        },
+        practice: {
+          kind: "code",
+          title: "写一个文件读取骨架",
+          task: "用 with open(\"data.txt\", \"r\", encoding=\"utf-8\") as file: 读取 text = file.read()。",
+          starter: "",
+          checks: [
+            ["with\\s+open\\s*\\(\\s*[\"']data\\.txt[\"']\\s*,\\s*[\"']r[\"']\\s*,\\s*encoding\\s*=\\s*[\"']utf-8[\"']\\s*\\)\\s+as\\s+file\\s*:", "需要标准 with open 写法。"],
+            ["text\\s*=\\s*file\\.read\\s*\\(\\s*\\)", "需要 text = file.read()。"]
+          ],
+          hint: "with 那一行后面有冒号，读取那行要缩进。",
+          answer: "with open(\"data.txt\", \"r\", encoding=\"utf-8\") as file:\n    text = file.read()"
+        }
+      },
+      {
+        title: "class 和 self：对象的基本读法",
+        minutes: 10,
+        tags: ["class", "self", "__init__"],
+        goal: "读懂类的初始化、属性和方法调用。",
+        html: `
+          <p>类可以理解成“把相关数据和函数打包”。对象是根据类创建出来的具体东西。</p>
+          <pre class="code">class Client:\n    def __init__(self, base_url):\n        self.base_url = base_url\n\n    def health(self):\n        return self.base_url + \"/health\"\n\nclient = Client(\"http://127.0.0.1:8765\")\nprint(client.health())</pre>
+          <table class="mini-table">
+            <tr><th>词</th><th>先这样理解</th></tr>
+            <tr><td><code>class</code></td><td>定义一种对象。</td></tr>
+            <tr><td><code>__init__</code></td><td>创建对象时自动执行。</td></tr>
+            <tr><td><code>self</code></td><td>当前这个对象自己。</td></tr>
+            <tr><td><code>self.base_url</code></td><td>对象保存的属性。</td></tr>
+          </table>
+        `,
+        quiz: {
+          prompt: "client = Client(\"x\") 时会自动调用哪个方法？",
+          options: [["__init__", true], ["health", false], ["return", false]],
+          explain: "__init__ 是初始化方法，创建对象时自动执行。"
+        },
+        practice: {
+          kind: "code",
+          title: "写一个小对象",
+          task: "定义 Device 类，__init__ 保存 name，info 方法 return self.name。",
+          starter: "",
+          checks: [
+            ["class\\s+Device\\s*:", "需要 class Device:。"],
+            ["def\\s+__init__\\s*\\(\\s*self\\s*,\\s*name\\s*\\)\\s*:", "需要 __init__(self, name)。"],
+            ["self\\.name\\s*=\\s*name", "需要 self.name = name。"],
+            ["def\\s+info\\s*\\(\\s*self\\s*\\)\\s*:", "需要 info(self)。"],
+            ["return\\s+self\\.name", "需要 return self.name。"]
+          ],
+          hint: "类里面的方法缩进一层，方法体再缩进一层。",
+          answer: "class Device:\n    def __init__(self, name):\n        self.name = name\n\n    def info(self):\n        return self.name"
+        }
+      },
+      {
+        title: "类型提示和 dataclass",
+        minutes: 7,
+        tags: ["类型提示", "dataclass", "读懂即可"],
+        goal: "看懂常见类型提示，不把它当成新语法大山。",
+        html: `
+          <p>类型提示主要给人和编辑器看，帮助理解参数和返回值。</p>
+          <pre class="code">def read_ai(channel: str = \"ai0\", samples: int = 1) -> dict:\n    ...</pre>
+          <p><code>dataclass</code> 适合定义只装数据的小对象。</p>
+          <pre class="code">from dataclasses import dataclass\n\n@dataclass(frozen=True)\nclass DeviceInfo:\n    name: str\n    product_type: str\n    serial_num: str</pre>
+          <p>读到 <code>list[DeviceInfo]</code>，就理解成“一个列表，里面每项是 DeviceInfo”。读到 <code>dict[str, Any]</code>，就理解成“键是字符串，值可以是各种东西”。</p>
+        `,
+        quiz: {
+          prompt: "channel: str = \"ai0\" 里 str 是什么？",
+          options: [["类型提示", true], ["变量值", false], ["函数名", false]],
+          explain: "它提示 channel 预计是字符串。"
+        },
+        practice: {
+          kind: "code",
+          title: "定义数据容器",
+          task: "用 dataclass 定义 ChannelInfo，包含 name: str 和 index: int。",
+          starter: "from dataclasses import dataclass\n\n",
+          checks: [
+            ["@dataclass", "需要 @dataclass。"],
+            ["class\\s+ChannelInfo\\s*:", "需要 class ChannelInfo:。"],
+            ["name\\s*:\\s*str", "需要 name: str。"],
+            ["index\\s*:\\s*int", "需要 index: int。"]
+          ],
+          hint: "dataclass 的字段直接写在类里面。",
+          answer: "from dataclasses import dataclass\n\n@dataclass\nclass ChannelInfo:\n    name: str\n    index: int"
+        }
+      },
+      {
+        title: "读项目第一层：客户端怎么用",
+        minutes: 8,
+        tags: ["USB6363", "client", "读码"],
+        goal: "把基础语法连接到真实调用方式。",
+        html: `
+          <p>现在才回到项目。普通子程序不直接碰硬件，只使用客户端。</p>
+          <pre class="code">from usb6363_client import Usb6363Client\n\n\ndef main() -> int:\n    daq = Usb6363Client()\n    result = daq.read_ai(channel=\"ai0\")\n    voltage = result[\"values\"]\n    print(f\"ai0 = {voltage:.6f} V\")\n    return 0\n\n\nif __name__ == \"__main__\":\n    raise SystemExit(main())</pre>
+          <h3>你现在应该能认出</h3>
+          <ul>
+            <li><code>import</code>：拿客户端类。</li>
+            <li><code>main()</code>：脚本入口。</li>
+            <li><code>daq = Usb6363Client()</code>：创建对象。</li>
+            <li><code>read_ai(channel="ai0")</code>：关键字参数。</li>
+            <li><code>result["values"]</code>：从字典取值。</li>
+            <li><code>f"...{voltage:.6f}..."</code>：格式化输出。</li>
+          </ul>
+        `,
+        quiz: {
+          prompt: "result[\"values\"] 属于哪个知识点？",
+          options: [["字典取值", true], ["类定义", false], ["异常捕获", false]],
+          explain: "read_ai 返回字典，values 是其中一个键。"
+        },
+        practice: {
+          kind: "code",
+          title: "写一个读 ai0 的最小脚本",
+          task: "创建 daq，读取 ai0，把 values 保存到 voltage。",
+          starter: "from usb6363_client import Usb6363Client\n\n",
+          checks: [
+            ["daq\\s*=\\s*Usb6363Client\\s*\\(", "需要创建 daq = Usb6363Client()。"],
+            ["result\\s*=\\s*daq\\.read_ai\\s*\\(\\s*channel\\s*=\\s*[\"']ai0[\"']\\s*\\)", "需要 result = daq.read_ai(channel=\"ai0\")。"],
+            ["voltage\\s*=\\s*result\\s*\\[\\s*[\"']values[\"']\\s*\\]", "需要 voltage = result[\"values\"]。"]
+          ],
+          hint: "这关不要求完整 main，只练三步调用。",
+          answer: "from usb6363_client import Usb6363Client\n\ndaq = Usb6363Client()\nresult = daq.read_ai(channel=\"ai0\")\nvoltage = result[\"values\"]"
+        }
+      },
+      {
+        title: "读项目第二层：client 方法",
+        minutes: 8,
+        tags: ["方法", "_get", "封装"],
+        goal: "看懂客户端方法只是把参数打包给 _get/_post。",
+        html: `
+          <p>客户端里的公开方法通常很短。它们把你传的参数整理成字典，然后交给内部 HTTP 函数。</p>
+          <pre class="code">def read_ai(self, channel=\"ai0\", samples=1, rate=1000.0):\n    return self._get(\n        \"/api/ai/read\",\n        {\n            \"channel\": channel,\n            \"samples\": samples,\n            \"rate\": rate,\n        },\n    )</pre>
+          <p>下划线开头的 <code>_get</code> 表示内部辅助方法。普通使用者通常不直接调用它。</p>
+          <div class="callout">读法：这个函数没有直接读硬件，它只是把 read_ai 这个友好调用翻译成 API 请求。</div>
+        `,
+        quiz: {
+          prompt: "read_ai 里 return self._get(...) 说明什么？",
+          options: [["read_ai 把工作委托给内部 GET 请求方法", true], ["read_ai 直接操作硬件", false], ["read_ai 没有返回值", false]],
+          explain: "客户端层主要负责封装 HTTP 调用。"
+        },
+        practice: {
+          kind: "code",
+          title: "模仿写一个客户端方法",
+          task: "写方法 get_device(self)，返回 self._get(\"/api/device\")。",
+          starter: "def get_device(self):\n    ",
+          checks: [
+            ["def\\s+get_device\\s*\\(\\s*self\\s*\\)\\s*:", "需要 def get_device(self):。"],
+            ["return\\s+self\\._get\\s*\\(\\s*[\"']/api/device[\"']\\s*\\)", "需要 return self._get(\"/api/device\")。"]
+          ],
+          hint: "这是一节读码练习，不需要写完整 class。",
+          answer: "def get_device(self):\n    return self._get(\"/api/device\")"
+        }
+      },
+      {
+        title: "读项目第三层：server 路由",
+        minutes: 8,
+        tags: ["HTTP", "if/elif", "路由"],
+        goal: "看懂 URL 如何对应到底层函数。",
+        html: `
+          <p>服务器收到请求后，根据路径决定调用哪个函数。这就是路由。</p>
+          <pre class="code">if parsed.path == \"/health\":\n    self._send_json({\"ok\": True})\nelif parsed.path == \"/api/ai/read\":\n    self._send_json(controller.read_ai_voltage(**_ai_args(query)))\nelse:\n    self._send_error(HTTPStatus.NOT_FOUND, \"Unknown route\")</pre>
+          <p>这里你已经学过大部分语法：<code>if/elif/else</code>、字典、函数调用、异常响应。</p>
+          <h3>**_ai_args(query)</h3>
+          <p><code>_ai_args(query)</code> 返回一个字典。前面的 <code>**</code> 会把字典展开成关键字参数。</p>
+          <pre class="code">func(**{\"channel\": \"ai0\", \"samples\": 1})\n# 等价于\nfunc(channel=\"ai0\", samples=1)</pre>
+        `,
+        quiz: {
+          prompt: "func(**{\"x\": 1}) 等价于什么？",
+          options: [["func(x=1)", true], ["func({\"x\": 1})", false], ["func(**x)", false]],
+          explain: "** 会把字典展开成关键字参数。"
+        },
+        practice: {
+          kind: "code",
+          title: "把字典展开成参数",
+          task: "给定 args = {\"channel\": \"ai0\"}，调用 read_ai(**args)。",
+          starter: "args = {\"channel\": \"ai0\"}\n",
+          checks: [
+            ["read_ai\\s*\\(\\s*\\*\\*args\\s*\\)", "需要 read_ai(**args)。"]
+          ],
+          hint: "两个星号写在变量名前面。",
+          answer: "args = {\"channel\": \"ai0\"}\nread_ai(**args)"
+        }
+      },
+      {
+        title: "读项目第四层：core 参数检查",
+        minutes: 8,
+        tags: ["core", "防错", "真实代码"],
+        goal: "能读懂底层函数前半段的参数处理。",
+        html: `
+          <p>底层函数真正碰硬件，所以它会先检查参数、统一通道名。</p>
+          <pre class="code">def read_ai_voltage(self, channel=\"ai0\", samples=1, rate=1000.0):\n    if samples < 1:\n        raise ValueError(\"samples must be >= 1\")\n    if rate <= 0:\n        raise ValueError(\"rate must be > 0\")\n\n    physical_channel = self._normalize_channel(channel, kind=\"ai\")</pre>
+          <p>这段不是高级魔法，就是你已经学过的：函数、默认参数、if、raise、方法调用、关键字参数。</p>
+          <div class="callout">读底层代码时，先把硬件库调用暂时折叠起来。先看它如何检查输入、准备变量、返回结果。</div>
+        `,
+        quiz: {
+          prompt: "physical_channel = self._normalize_channel(channel, kind=\"ai\") 这一行主要在做什么？",
+          options: [["把用户传的通道名统一成底层需要的格式", true], ["直接读取电压", false], ["启动 HTTP 服务", false]],
+          explain: "normalize 这类名字通常表示校验和统一格式。"
+        },
+        practice: {
+          kind: "code",
+          title: "写一个简化版通道规范化",
+          task: "定义 normalize_ai(channel)，如果 channel == \"ai0\"，返回 \"Dev2/ai0\"。",
+          starter: "",
+          checks: [
+            ["def\\s+normalize_ai\\s*\\(\\s*channel\\s*\\)\\s*:", "需要 def normalize_ai(channel):。"],
+            ["if\\s+channel\\s*==\\s*[\"']ai0[\"']\\s*:", "需要 if channel == \"ai0\":。"],
+            ["return\\s+[\"']Dev2/ai0[\"']", "需要 return \"Dev2/ai0\"。"]
+          ],
+          hint: "这只是简化练习，真实项目支持更多通道。",
+          answer: "def normalize_ai(channel):\n    if channel == \"ai0\":\n        return \"Dev2/ai0\""
+        }
+      },
+      {
+        title: "标准脚本入口",
+        minutes: 7,
+        tags: ["main", "__name__", "入口"],
+        goal: "能写出项目脚本的标准结构。",
+        html: `
+          <p>项目脚本建议都写成这种结构：</p>
+          <pre class="code">def main() -> int:\n    print(\"work\")\n    return 0\n\n\nif __name__ == \"__main__\":\n    raise SystemExit(main())</pre>
+          <p>这样这个文件被直接运行时会执行 <code>main()</code>；被别的文件 import 时不会自动执行。</p>
+          <p><code>return 0</code> 通常表示正常结束。</p>
+        `,
+        quiz: {
+          prompt: "if __name__ == \"__main__\" 的作用是？",
+          options: [["只在文件被直接运行时执行入口代码", true], ["定义一个变量", false], ["捕获异常", false]],
+          explain: "这是 Python 脚本常见入口保护。"
+        },
+        practice: {
+          kind: "code",
+          title: "写标准入口",
+          task: "写一个 main() -> int，打印 ready，return 0，并加标准入口判断。",
+          starter: "",
+          checks: [
+            ["def\\s+main\\s*\\(\\s*\\)\\s*->\\s*int\\s*:", "需要 def main() -> int:。"],
+            ["print\\s*\\(\\s*[\"']ready[\"']\\s*\\)", "需要 print(\"ready\")。"],
+            ["return\\s+0", "需要 return 0。"],
+            ["if\\s+__name__\\s*==\\s*[\"']__main__[\"']\\s*:", "需要 if __name__ == \"__main__\":。"],
+            ["raise\\s+SystemExit\\s*\\(\\s*main\\s*\\(\\s*\\)\\s*\\)", "需要 raise SystemExit(main())。"]
+          ],
+          hint: "入口判断放在文件最后。",
+          answer: "def main() -> int:\n    print(\"ready\")\n    return 0\n\n\nif __name__ == \"__main__\":\n    raise SystemExit(main())"
+        }
+      },
+      {
+        title: "最终闯关：读 AI 并判断",
+        minutes: 16,
+        tags: ["综合", "真实脚本", "4 小时收束"],
+        goal: "把 import、main、对象、字典、if、f-string 串成一个小脚本。",
+        html: `
+          <p>最后写一个真实风格的小脚本：读取 ai0，如果大于 1V 打印 high，否则打印 normal。</p>
+          <h3>拆成动作</h3>
+          <ol>
+            <li>导入 <code>Usb6363Client</code>。</li>
+            <li>定义 <code>main() -> int</code>。</li>
+            <li>创建 <code>daq</code>。</li>
+            <li>调用 <code>daq.read_ai(channel="ai0")</code>。</li>
+            <li>从 <code>result["values"]</code> 取电压。</li>
+            <li>用 <code>if voltage > 1.0</code> 判断。</li>
+            <li>最后 <code>return 0</code>，写标准入口。</li>
+          </ol>
+          <div class="callout">
+            如果你能独立写出这个脚本，说明今天最关键的 Python 读码基础已经串起来了。
+          </div>
+        `,
+        quiz: {
+          prompt: "这个综合脚本里，daq.read_ai(...) 返回的 result 最像什么类型？",
+          options: [["dict 字典", true], ["class 类定义", false], ["import 语句", false]],
+          explain: "客户端方法返回的是解析后的 JSON，也就是 Python 字典。"
+        },
+        practice: {
+          kind: "code",
+          title: "写完整小脚本",
+          task: "按左边步骤写完整脚本。检查器只做静态检查，不会真的访问硬件。",
+          starter: "from usb6363_client import Usb6363Client\n\n\n",
+          checks: [
+            ["from\\s+usb6363_client\\s+import\\s+Usb6363Client", "需要导入 Usb6363Client。"],
+            ["def\\s+main\\s*\\(\\s*\\)\\s*->\\s*int\\s*:", "需要定义 main() -> int。"],
+            ["daq\\s*=\\s*Usb6363Client\\s*\\(", "需要创建 daq。"],
+            ["result\\s*=\\s*daq\\.read_ai\\s*\\(\\s*channel\\s*=\\s*[\"']ai0[\"']\\s*\\)", "需要读取 ai0。"],
+            ["voltage\\s*=\\s*result\\s*\\[\\s*[\"']values[\"']\\s*\\]", "需要 voltage = result[\"values\"]。"],
+            ["if\\s+voltage\\s*>\\s*1\\.0\\s*:", "需要 if voltage > 1.0:。"],
+            ["print\\s*\\(\\s*[\"']high[\"']\\s*\\)", "超过阈值时打印 high。"],
+            ["else\\s*:", "需要 else:。"],
+            ["print\\s*\\(\\s*[\"']normal[\"']\\s*\\)", "否则打印 normal。"],
+            ["return\\s+0", "main 需要 return 0。"],
+            ["if\\s+__name__\\s*==\\s*[\"']__main__[\"']\\s*:", "需要标准入口判断。"],
+            ["raise\\s+SystemExit\\s*\\(\\s*main\\s*\\(\\s*\\)\\s*\\)", "需要 raise SystemExit(main())。"]
+          ],
+          hint: "先写 main 里面的逻辑，再补最后两行入口。",
+          answer: "from usb6363_client import Usb6363Client\n\n\ndef main() -> int:\n    daq = Usb6363Client()\n    result = daq.read_ai(channel=\"ai0\")\n    voltage = result[\"values\"]\n\n    if voltage > 1.0:\n        print(\"high\")\n    else:\n        print(\"normal\")\n\n    return 0\n\n\nif __name__ == \"__main__\":\n    raise SystemExit(main())"
+        }
+      }
+    ];
+
+    let current = Number(localStorage.getItem("py4.current") || 0);
+    const done = new Set(JSON.parse(localStorage.getItem("py4.done") || "[]"));
+
+    const navRoot = document.getElementById("navRoot");
+    const progressText = document.getElementById("progressText");
+    const progressFill = document.getElementById("progressFill");
+    const lessonKicker = document.getElementById("lessonKicker");
+    const lessonTitle = document.getElementById("lessonTitle");
+    const lessonGoal = document.getElementById("lessonGoal");
+    const tagRoot = document.getElementById("tagRoot");
+    const contentRoot = document.getElementById("contentRoot");
+    const practiceRoot = document.getElementById("practiceRoot");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const prevBtn2 = document.getElementById("prevBtn2");
+    const nextBtn2 = document.getElementById("nextBtn2");
+    const doneBtn = document.getElementById("doneBtn");
+    const resetBtn = document.getElementById("resetBtn");
+
+    function save() {
+      localStorage.setItem("py4.current", String(current));
+      localStorage.setItem("py4.done", JSON.stringify([...done]));
+    }
+
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function renderNav() {
+      navRoot.innerHTML = modules.map((mod) => {
+        const buttons = mod.lessons.map((idx) => {
+          const lesson = lessons[idx];
+          const isDone = done.has(idx);
+          const active = idx === current;
+          return `
+            <button class="nav-btn ${isDone ? "done" : ""} ${active ? "active" : ""}" type="button" data-index="${idx}">
+              <span class="nav-num">${isDone ? "✓" : idx + 1}</span>
+              <span>${lesson.title}</span>
+              <span class="nav-time">${lesson.minutes}m</span>
+            </button>
+          `;
+        }).join("");
+        return `<div class="nav-title">${mod.name}</div><nav class="nav">${buttons}</nav>`;
+      }).join("");
+
+      navRoot.querySelectorAll(".nav-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+          current = Number(button.dataset.index);
+          save();
+          render();
+        });
+      });
+    }
+
+    function renderProgress() {
+      progressText.textContent = `${done.size} / ${lessons.length}`;
+      progressFill.style.width = `${Math.round((done.size / lessons.length) * 100)}%`;
+    }
+
+    function renderQuiz(lesson) {
+      const q = lesson.quiz;
+      return `
+        <h3>先猜一下</h3>
+        <p>${q.prompt.replace(/\n/g, "<br>")}</p>
+        <div class="options">
+          ${q.options.map((item, idx) => `
+            <button class="option" type="button" data-correct="${item[1]}" data-option="${idx}">${item[0]}</button>
+          `).join("")}
+        </div>
+        <div class="feedback" id="quizFeedback" style="margin-top:10px;">选一个答案，训练读代码直觉。</div>
+      `;
+    }
+
+    function renderPractice(lesson) {
+      const p = lesson.practice;
+      if (p.kind === "checklist") {
+        practiceRoot.innerHTML = `
+          <h3>${p.title}</h3>
+          <p>${p.task}</p>
+          <div class="checkpoint">
+            ${p.items.map((item, idx) => `
+              <label class="check-row">
+                <input type="checkbox" data-check="${idx}">
+                <span>${item}</span>
+              </label>
+            `).join("")}
+          </div>
+          <div class="actions">
+            <button class="btn green" id="checkPractice" type="button">完成本关</button>
+          </div>
+          <div class="feedback" id="practiceFeedback">全部勾选后点击完成。</div>
+        `;
+        document.getElementById("checkPractice").addEventListener("click", () => {
+          const allChecked = [...practiceRoot.querySelectorAll("input[type='checkbox']")].every((box) => box.checked);
+          const feedback = document.getElementById("practiceFeedback");
+          if (!allChecked) {
+            feedback.className = "feedback bad";
+            feedback.textContent = "还有没勾选的项。";
+            return;
+          }
+          markDone("完成。今天按这个节奏走就行。");
+        });
+        return;
+      }
+
+      practiceRoot.innerHTML = `
+        <h3>${p.title}</h3>
+        <p>${p.task}</p>
+        <textarea class="editor" id="editor" spellcheck="false">${p.starter}</textarea>
+        <div class="actions">
+          <button class="btn green" id="checkPractice" type="button">检查代码</button>
+          <button class="btn" id="hintBtn" type="button">提示</button>
+          <button class="btn" id="answerBtn" type="button">参考答案</button>
+        </div>
+        <div class="feedback" id="practiceFeedback">写几行代码，然后点击检查。</div>
+        <div class="hint" id="hintBox">${p.hint}</div>
+        <div class="answer" id="answerBox"><strong>一种参考写法：</strong><pre class="code">${escapeHtml(p.answer)}</pre></div>
+      `;
+
+      document.getElementById("checkPractice").addEventListener("click", () => {
+        const code = document.getElementById("editor").value;
+        const failed = p.checks.find(([pattern]) => !(new RegExp(pattern, "s").test(code)));
+        const feedback = document.getElementById("practiceFeedback");
+        if (failed) {
+          feedback.className = "feedback bad";
+          feedback.textContent = failed[1];
+          return;
+        }
+        markDone("通过。这个语法点可以进入下一关。");
+      });
+
+      document.getElementById("hintBtn").addEventListener("click", () => {
+        const box = document.getElementById("hintBox");
+        box.style.display = box.style.display === "block" ? "none" : "block";
+      });
+
+      document.getElementById("answerBtn").addEventListener("click", () => {
+        const box = document.getElementById("answerBox");
+        box.style.display = box.style.display === "block" ? "none" : "block";
+      });
+    }
+
+    function bindQuiz(lesson) {
+      document.querySelectorAll(".option").forEach((button) => {
+        button.addEventListener("click", () => {
+          const isCorrect = button.dataset.correct === "true";
+          document.querySelectorAll(".option").forEach((option) => {
+            option.classList.remove("wrong", "correct");
+            if (option.dataset.correct === "true") option.classList.add("correct");
+          });
+          if (!isCorrect) button.classList.add("wrong");
+          const feedback = document.getElementById("quizFeedback");
+          feedback.className = `feedback ${isCorrect ? "good" : "bad"}`;
+          feedback.textContent = isCorrect ? `答对了。${lesson.quiz.explain}` : `还差一点。${lesson.quiz.explain}`;
+        });
+      });
+    }
+
+    function markDone(message) {
+      done.add(current);
+      save();
+      renderProgress();
+      renderNav();
+      doneBtn.textContent = "已完成";
+      const feedback = document.getElementById("practiceFeedback");
+      if (feedback) {
+        feedback.className = "feedback good";
+        feedback.textContent = message;
+      }
+    }
+
+    function go(delta) {
+      const next = current + delta;
+      if (next < 0 || next >= lessons.length) return;
+      current = next;
+      save();
+      render();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function render() {
+      const lesson = lessons[current];
+      lessonKicker.textContent = `第 ${current + 1} 关 · 建议 ${lesson.minutes} 分钟`;
+      lessonTitle.textContent = lesson.title;
+      lessonGoal.textContent = lesson.goal;
+      tagRoot.innerHTML = lesson.tags.map((tag, idx) => `<span class="tag ${idx % 2 ? "green" : ""}">${tag}</span>`).join("");
+      contentRoot.innerHTML = lesson.html + renderQuiz(lesson);
+      renderPractice(lesson);
+      bindQuiz(lesson);
+      renderNav();
+      renderProgress();
+
+      prevBtn.disabled = current === 0;
+      prevBtn2.disabled = current === 0;
+      nextBtn.disabled = current === lessons.length - 1;
+      nextBtn2.disabled = current === lessons.length - 1;
+      doneBtn.textContent = done.has(current) ? "已完成" : "我理解了";
+    }
+
+    prevBtn.addEventListener("click", () => go(-1));
+    prevBtn2.addEventListener("click", () => go(-1));
+    nextBtn.addEventListener("click", () => go(1));
+    nextBtn2.addEventListener("click", () => go(1));
+    doneBtn.addEventListener("click", () => markDone("已标记完成。"));
+    resetBtn.addEventListener("click", () => {
+      if (!confirm("确定重置进度吗？")) return;
+      done.clear();
+      current = 0;
+      save();
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
