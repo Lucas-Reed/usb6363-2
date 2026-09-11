@@ -13,8 +13,6 @@ import math
 import time
 from typing import Any
 
-import numpy as np
-
 # 注意：这里故意不在文件顶部 import nidaqmx。
 # 原因是 NI-DAQmx 在某些状态下 import/初始化可能会比较慢，甚至卡住。
 # 如果 server 启动阶段就 import nidaqmx，那么 8765 端口会开不出来，
@@ -215,50 +213,6 @@ def read_continuous_ai_chunk(
     return split_ai_read_values(raw_values, channel_count)
 
 
-def create_continuous_ai_reader(task: Any, channel_count: int, samples_per_read: int) -> tuple[Any, Any]:
-    """Create a reusable reader and destination array for a continuous task.
-
-    This deliberately keeps task creation/configuration in the existing path;
-    callers still own task lifetime. The returned array is reused by the caller.
-    """
-    if channel_count < 1 or samples_per_read < 1:
-        raise ValueError("channel_count and samples_per_read must be positive")
-    nidaqmx_module, _, _, _, _ = _load_nidaqmx()
-    from nidaqmx.stream_readers import AnalogMultiChannelReader
-
-    _ = nidaqmx_module
-    return AnalogMultiChannelReader(task.in_stream), np.empty(
-        (channel_count, samples_per_read), dtype=np.float64
-    )
-
-
-def read_continuous_ai_chunk_into(
-    reader: Any,
-    destination: Any,
-    samples_per_read: int,
-    timeout: float,
-) -> list[list[float]]:
-    """Read into a reusable NumPy array while preserving the old list API."""
-    if destination.ndim != 2 or destination.shape[1] != samples_per_read:
-        raise ValueError("destination shape must match the requested sample count")
-    reader.read_many_sample(
-        destination,
-        number_of_samples_per_channel=samples_per_read,
-        timeout=timeout,
-    )
-    return destination.tolist()
-
-
-def register_continuous_ai_callback(task: Any, samples_per_callback: int, callback: Any) -> None:
-    """Register an Every-N callback without changing task configuration."""
-    if samples_per_callback < 1:
-        raise ValueError("samples_per_callback must be positive")
-    task.register_every_n_samples_acquired_into_buffer_event(
-        samples_per_callback,
-        callback,
-    )
-
-
 def create_continuous_ai_task(
     channels: list[str],
     rate: float,
@@ -268,7 +222,6 @@ def create_continuous_ai_task(
     max_val: float = 10.0,
     start_trigger_source: str | None = None,
     start_trigger_edge_name: str = "RISING",
-    start_task: bool = True,
 ) -> Any:
     """创建并启动连续 AI Task。
 
@@ -308,8 +261,7 @@ def create_continuous_ai_task(
                 trigger_source=start_trigger_source,
                 trigger_edge=_edge(start_trigger_edge_name),
             )
-        if start_task:
-            task.start()
+        task.start()
         return task
     except Exception:
         task.close()
