@@ -13,6 +13,8 @@ import math
 import time
 from typing import Any
 
+import numpy as np
+
 # 注意：这里故意不在文件顶部 import nidaqmx。
 # 原因是 NI-DAQmx 在某些状态下 import/初始化可能会比较慢，甚至卡住。
 # 如果 server 启动阶段就 import nidaqmx，那么 8765 端口会开不出来，
