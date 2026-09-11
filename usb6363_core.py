@@ -1372,11 +1372,16 @@ class DaqController:
                     start_trigger_edge_name=str(settings["trigger_edge"]),
                 )
                 try:
+                    optimized_reader, optimized_buffer = nidaqmx_driver.create_continuous_ai_reader(
+                        task=task,
+                        channel_count=len(channels),
+                        samples_per_read=samples_per_frame,
+                    )
                     while not stop_event.is_set():
-                        channel_values = nidaqmx_driver.read_continuous_ai_chunk(
-                            task=task,
+                        channel_values = nidaqmx_driver.read_continuous_ai_chunk_into(
+                            reader=optimized_reader,
+                            destination=optimized_buffer,
                             samples_per_read=samples_per_frame,
-                            channel_count=len(channels),
                             timeout=float(settings["timeout"]),
                         )
                         now = time.time()
