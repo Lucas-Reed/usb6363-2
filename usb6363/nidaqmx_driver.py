@@ -247,6 +247,16 @@ def read_continuous_ai_chunk_into(
     return destination.tolist()
 
 
+def register_continuous_ai_callback(task: Any, samples_per_callback: int, callback: Any) -> None:
+    """Register an Every-N callback without changing task configuration."""
+    if samples_per_callback < 1:
+        raise ValueError("samples_per_callback must be positive")
+    task.register_every_n_samples_acquired_into_buffer_event(
+        samples_per_callback,
+        callback,
+    )
+
+
 def create_continuous_ai_task(
     channels: list[str],
     rate: float,
@@ -256,6 +266,7 @@ def create_continuous_ai_task(
     max_val: float = 10.0,
     start_trigger_source: str | None = None,
     start_trigger_edge_name: str = "RISING",
+    start_task: bool = True,
 ) -> Any:
     """创建并启动连续 AI Task。
 
@@ -295,7 +306,8 @@ def create_continuous_ai_task(
                 trigger_source=start_trigger_source,
                 trigger_edge=_edge(start_trigger_edge_name),
             )
-        task.start()
+        if start_task:
+            task.start()
         return task
     except Exception:
         task.close()

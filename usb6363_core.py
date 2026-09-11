@@ -14,6 +14,7 @@
 from __future__ import annotations
 
 import json
+import queue
 import re
 import threading
 import time
@@ -1370,6 +1371,7 @@ class DaqController:
                     max_val=float(settings["max_val"]),
                     start_trigger_source=settings["trigger_source"],
                     start_trigger_edge_name=str(settings["trigger_edge"]),
+                    start_task=False,
                 )
                 try:
                     optimized_reader, optimized_buffer = nidaqmx_driver.create_continuous_ai_reader(
@@ -1377,13 +1379,65 @@ class DaqController:
                         channel_count=len(channels),
                         samples_per_read=samples_per_frame,
                     )
+                    callback_samples = max(
+                        1,
+                        min(
+                            samples_per_frame,
+                            int(round(float(settings["rate_per_channel"]) * AI_READ_CHUNK_SECONDS)),
+                        ),
+                    )
+                    callback_buffer = np.empty(
+                        (len(channels), callback_samples), dtype=np.float64
+                    )
+                    blocks: queue.Queue[np.ndarray] = queue.Queue(maxsize=16)
+                    callback_error: list[BaseException] = []
+                    callback_lock = threading.Lock()
+
+                    def on_samples(_task_handle: Any, _event_type: Any,
+                                   number_of_samples: int, _callback_data: Any) -> int:
+                        try:
+                            with callback_lock:
+                                if stop_event.is_set():
+                                    return 0
+                                if number_of_samples != callback_samples:
+                                    raise RuntimeError(
+                                        f"Every-N callback returned {number_of_samples} samples; "
+                                        f"expected {callback_samples}"
+                                    )
+                                optimized_reader.read_many_sample(
+                                    callback_buffer,
+                                    number_of_samples_per_channel=callback_samples,
+                                    timeout=float(settings["timeout"]),
+                                )
+                                blocks.put_nowait(callback_buffer.copy())
+                        except queue.Full:
+                            callback_error.append(RuntimeError("unified AI callback queue is full"))
+                        except BaseException as exc:
+                            callback_error.append(exc)
+                        return 0
+
+                    nidaqmx_driver.register_continuous_ai_callback(
+                        task, callback_samples, on_samples
+                    )
+                    task.start()
+                    pending_parts: list[np.ndarray] = []
+                    pending_samples = 0
                     while not stop_event.is_set():
-                        channel_values = nidaqmx_driver.read_continuous_ai_chunk_into(
-                            reader=optimized_reader,
-                            destination=optimized_buffer,
-                            samples_per_read=samples_per_frame,
-                            timeout=float(settings["timeout"]),
-                        )
+                        if callback_error:
+                            raise callback_error[0]
+                        try:
+                            block = blocks.get(timeout=0.2)
+                        except queue.Empty:
+                            continue
+                        pending_parts.append(block)
+                        pending_samples += block.shape[1]
+                        if pending_samples < samples_per_frame:
+                            continue
+                        merged = np.concatenate(pending_parts, axis=1)
+                        channel_values = merged[:, :samples_per_frame].tolist()
+                        remainder = merged[:, samples_per_frame:]
+                        pending_parts = [remainder] if remainder.shape[1] else []
+                        pending_samples = remainder.shape[1]
                         now = time.time()
                         segment_frame_id += 1
                         # 转换放在状态锁之外，避免大数组复制阻塞状态查询和批量读取。
