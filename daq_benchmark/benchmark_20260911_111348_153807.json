@@ -1,0 +1,3747 @@
+{
+  "metadata": {
+    "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "numpy": "2.5.0",
+    "nidaqmx": "1.5.0",
+    "notes": "CPU uses 100% per logical core. Quantiles retain last 200000 reads. Backlog sampled after each read. Throughput measures host delivery. No downstream copy, trigger, output, or waveform validation. Completed means execution finished, not a latency or lossless certification.",
+    "daqmx_driver_version": "DriverVersion(major_version=18, minor_version=5, update_version=0)"
+  },
+  "results": [
+    {
+      "summary": {
+        "method": "callback",
+        "repeat": 1,
+        "device": "Dev2",
+        "channels": "Dev2/ai0,Dev2/ai1,Dev2/ai2",
+        "terminal": "DIFF",
+        "min_v": -10,
+        "max_v": 10,
+        "requested_rate_per_channel": 100000,
+        "requested_chunk_ms": 5.0,
+        "chunk_samples_per_channel": 500,
+        "requested_seconds": 300.0,
+        "warmup_seconds": 2,
+        "poll_ms": null,
+        "status": "completed",
+        "error_code": null,
+        "error": null,
+        "actual_rate_per_channel": 100000.0,
+        "input_buffer_samples_per_channel": 100000,
+        "actual_chunk_ms": 5.0,
+        "end_unread_per_channel": 0,
+        "acquired_per_channel_including_warmup": 30196500,
+        "measured_seconds": 300.00091470000916,
+        "reads": 60001,
+        "samples_per_channel": 30000500,
+        "delivered_samples_per_channel_s": 100001.3617625116,
+        "cpu_percent_one_core": 4.171862279991781,
+        "backlog_after_read_mean": 0.008666522224629589,
+        "backlog_after_read_max": 500,
+        "backlog_slope_samples_per_channel_s": -8.904103874744967e-05,
+        "return_interval_max_ms": 14.52110000536777,
+        "read_duration_max_ms": 9.64520001434721,
+        "distribution_reads_retained": 60001,
+        "distribution_truncated": false,
+        "return_interval_ms_p50": 4.9992999993264675,
+        "return_interval_ms_p99": 5.258099990896881,
+        "read_duration_ms_p50": 0.09919999865815043,
+        "read_duration_ms_p99": 0.221800000872463,
+        "batch_samples_per_channel_p50": 500.0,
+        "batch_samples_per_channel_p99": 500.0
+      },
+      "backlog_timeline": [
+        {
+          "elapsed_s": 0.005039699986809865,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 1.0050494000024628,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 2.010014700004831,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 3.010134799988009,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 4.014991300005931,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 5.015010300005088,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 6.019788200006587,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 7.019937999983085,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 8.024762399989413,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 9.02492979998351,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 10.029891299986048,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 11.034918599994853,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 12.039792299998226,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 13.039909499988426,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 14.044849700003397,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 15.04984809999587,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 16.04993700000341,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 17.054795400006697,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 18.054830899985973,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 19.059814499982167,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 20.064772499987157,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 21.069589399994584,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 22.069713300006697,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 23.06983580000815,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 24.074672299990198,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 25.07474129999173,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 26.07485549998819,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 27.079746400006115,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 28.079826300003333,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 29.08465159998741,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 30.084655499988003,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 31.08957250000094,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 32.08977200000663,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 33.0947046999936,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 34.09478409998701,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 35.09952419999172,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 36.10442009998951,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 37.10463439999148,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 38.10954309999943,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 39.11447549998411,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 40.119381099997554,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 41.119494599988684,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 42.11950369999977,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 43.12448629998835,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 44.12461159998202,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 45.129463399993256,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 46.129564700007904,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 47.134381499985466,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 48.13940849999199,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 49.139486200001556,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 50.14441849998548,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 51.14925960000255,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 52.149331099994015,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 53.15427020000061,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 54.15920999998343,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 55.1592224999913,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 56.16413059999468,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 57.164133399986895,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 58.16918870000518,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 59.17407449998427,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 60.17412919999333,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 61.17915009998251,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 62.18407560000196,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 63.18904779999866,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 64.19408220000332,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 65.19905359999393,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 66.2041223999986,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 67.20898399999714,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 68.2090060999908,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 69.20912539999699,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 70.21410409998498,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 71.21905799998785,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 72.21916099998634,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 73.22461259999545,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 74.22911049998947,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 75.23392460000468,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 76.23397249999107,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 77.2340464000008,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 78.23407909998787,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 79.23920819998602,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 80.24411569998483,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 81.24879109999165,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 82.24902960000327,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 83.25391319999471,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 84.2588681000052,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 85.2589451999811,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 86.2638486000069,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 87.26397780000116,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 88.26403629998094,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 89.26885269998456,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 90.2738706000091,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 91.27882400000817,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 92.27900519999093,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 93.2838563999976,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 94.28886349999812,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 95.29373780000606,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 96.29867849999573,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 97.30359719999251,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 98.3038644999906,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 99.30870029999642,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 100.30875989998458,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 101.31373259998509,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 102.31375219998881,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 103.31865189998643,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 104.31873110000743,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 105.32381090000854,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 106.32858249999117,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 107.3335196999833,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 108.33359589998145,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 109.33360809998703,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 110.33365779998712,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 111.33854460000293,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 112.33856139998534,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 113.3435962999938,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 114.34839149998152,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 115.3485354000004,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 116.35336310000275,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 117.35353459999897,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 118.35358170000836,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 119.35365720000118,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 120.35848189998069,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 121.36343679999118,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 122.36838770000031,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 123.36841249998542,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 124.37336929998128,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 125.37337029998889,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 126.37825029998203,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 127.37831209998694,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 128.37832240000716,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 129.383316499996,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 130.38360830000602,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 131.38831360000768,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 132.3932331999822,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 133.393258600001,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 134.39824999999837,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 135.39831970000523,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 136.40321160000167,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 137.40815249999287,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 138.40824489999795,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 139.41317849999177,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 140.4132707999961,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 141.4181534999807,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 142.41818380000768,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 143.42315119999694,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 144.42318230000092,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 145.42799809999997,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 146.42817490000743,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 147.42824099998688,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 148.4282411999884,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 149.43299440000555,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 150.43799239999498,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 151.4381383,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 152.43832519999705,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 153.44299519999186,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 154.44790050000302,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 155.44792489998508,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 156.44818730000407,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 157.4529193000053,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 158.4529640999972,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 159.45305340000778,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 160.45792630000506,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 161.46294530000887,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 162.46299870000803,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 163.4678301999811,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 164.47276189998956,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 165.472775000002,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 166.47301190000144,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 167.47777739999583,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 168.4779806000006,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 169.48298619998968,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 170.4879268000077,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 171.4929220000049,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 172.49772459999076,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 173.50269890000345,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 174.50275909999618,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 175.50278419998358,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 176.50281149998773,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 177.507638399984,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 178.5077490999829,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 179.51272539998172,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 180.51759460000903,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 181.5175951999845,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 182.52251549999346,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 183.52284520000103,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 184.5277150000038,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 185.53269220000948,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 186.5375540999812,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 187.54239829999278,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 188.542578099994,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 189.54749120000633,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 190.55245019998983,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 191.55252589998418,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 192.55748650000896,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 193.56241320000845,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 194.56249290000414,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 195.56251899999916,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 196.56744310000795,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 197.57243129998096,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 198.5773011999845,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 199.57739190000575,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 200.57755019998876,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 201.5823978999979,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 202.58727220000583,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 203.59219419999863,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 204.5922872000083,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 205.5923305999895,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 206.59732840000652,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 207.60224849998485,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 208.6022701000038,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 209.6022943999851,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 210.60728930000914,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 211.61224940000102,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 212.6122716999962,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 213.61745240000891,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 214.62221339999815,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 215.6272032999841,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 216.62732939998386,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 217.63211609999416,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 218.63745760000893,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 219.64212030000635,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 220.64220259999274,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 221.64709260000382,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 222.65214900000137,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 223.65706659998978,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 224.66200489999028,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 225.66210719998344,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 226.66707609998411,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 227.66718570000376,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 228.67201539999223,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 229.6771783999866,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 230.68203860000358,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 231.68697469998733,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 232.69194339998649,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 233.69691989998682,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 234.69701760000316,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 235.70185710000806,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 236.70726840000134,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 237.71206520000123,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 238.71689009998227,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 239.72186489999876,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 240.72682710000663,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 241.72685300000012,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 242.72687799998675,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 243.7318915000069,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 244.73677869999665,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 245.73681080000824,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 246.7417243999953,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 247.74177359999157,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 248.74179749999894,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 249.74685540000792,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 250.75170979998074,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 251.75172269999166,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 252.75675969998701,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 253.76163739999174,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 254.761711500003,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 255.76677469999413,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 256.7716301000037,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 257.7766905000026,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 258.781576999987,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 259.7816216000065,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 260.78673510000226,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 261.7916321000084,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 262.79163379999227,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 263.79180639999686,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 264.7965624000062,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 265.80157019998296,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 266.80648890000884,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 267.8066653999849,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 268.81143860000884,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 269.8114810999832,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 270.811527199985,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 271.8164276999887,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 272.8164320999931,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 273.82139070000267,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 274.8214202999952,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 275.8263839999854,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 276.82657350000227,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 277.83134909998626,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 278.8363421999966,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 279.8413409999921,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 280.8463342000032,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 281.84634669998195,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 282.8463843000063,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 283.85137429999304,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 284.85141460000887,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 285.85624399999506,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 286.8612341999833,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 287.86123789998237,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 288.86609870000393,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 289.86620829999447,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 290.8712404999824,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 291.8714140999946,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 292.87608059999184,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 293.87612430000445,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 294.88101660000393,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 295.881361000007,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 296.88612869998906,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 297.89108460000716,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 298.8910864999925,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 299.89600249999785,
+          "unread_per_channel": 0
+        }
+      ]
+    },
+    {
+      "summary": {
+        "method": "callback",
+        "repeat": 2,
+        "device": "Dev2",
+        "channels": "Dev2/ai0,Dev2/ai1,Dev2/ai2",
+        "terminal": "DIFF",
+        "min_v": -10,
+        "max_v": 10,
+        "requested_rate_per_channel": 100000,
+        "requested_chunk_ms": 5.0,
+        "chunk_samples_per_channel": 500,
+        "requested_seconds": 300.0,
+        "warmup_seconds": 2,
+        "poll_ms": null,
+        "status": "completed",
+        "error_code": null,
+        "error": null,
+        "actual_rate_per_channel": 100000.0,
+        "input_buffer_samples_per_channel": 100000,
+        "actual_chunk_ms": 5.0,
+        "end_unread_per_channel": 0,
+        "acquired_per_channel_including_warmup": 30196000,
+        "measured_seconds": 300.0009686999838,
+        "reads": 60001,
+        "samples_per_channel": 30000500,
+        "delivered_samples_per_channel_s": 100001.34376233307,
+        "cpu_percent_one_core": 4.3385276575610945,
+        "backlog_after_read_mean": 0.0,
+        "backlog_after_read_max": 0,
+        "backlog_slope_samples_per_channel_s": 0.0,
+        "return_interval_max_ms": 7.884399994509295,
+        "read_duration_max_ms": 0.97490000189282,
+        "distribution_reads_retained": 60001,
+        "distribution_truncated": false,
+        "return_interval_ms_p50": 4.9992999993264675,
+        "return_interval_ms_p99": 5.271200003335252,
+        "read_duration_ms_p50": 0.09869999485090375,
+        "read_duration_ms_p99": 0.21100000594742596,
+        "batch_samples_per_channel_p50": 500.0,
+        "batch_samples_per_channel_p99": 500.0
+      },
+      "backlog_timeline": [
+        {
+          "elapsed_s": 0.004949599999235943,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 1.00497449998511,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 2.0098144999938086,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 3.009838400001172,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 4.009963699994842,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 5.014948199997889,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 6.019848399999319,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 7.0248459999857005,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 8.029821599979186,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 9.034727399994154,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 10.034834299993236,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 11.03978749999078,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 12.039904399978695,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 13.04476170000271,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 14.049719300004654,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 15.054757299978519,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 16.05980489999638,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 17.06489429998328,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 18.069763799983775,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 19.074564799986547,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 20.074572799989255,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 21.074702999991132,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 22.079656199988676,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 23.07967879998614,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 24.07970549998572,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 25.08459819998825,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 26.08954429998994,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 27.089598799997475,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 28.094566599989776,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 29.099491100001615,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 30.099516499991296,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 31.104418200004147,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 32.104481199989095,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 33.10944649999146,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 34.109480699989945,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 35.11443099999451,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 36.114446799998404,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 37.119365599995945,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 38.11946779998834,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 39.124345999996876,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 40.12445169998682,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 41.12942099999054,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 42.13437429998885,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 43.13935219999985,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 44.14426949998597,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 45.14431929998682,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 46.14922629998182,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 47.154252199979965,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 48.1543393000029,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 49.15919889998622,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 50.159276099991985,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 51.164231399976416,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 52.164245299994946,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 53.16426039999351,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 54.164272699999856,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 55.164327699982096,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 56.16917429998284,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 57.169201199983945,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 58.169321900000796,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 59.17405439997674,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 60.174186599993845,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 61.17901910000364,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 62.179118600004585,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 63.17920689997845,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 64.18417809999664,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 65.18437809997704,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 66.18910029999097,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 67.19410929997684,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 68.19908299998497,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 69.20405549998395,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 70.20908079997753,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 71.21386170000187,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 72.21398539998336,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 73.21902160000172,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 74.22400829999242,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 75.22899539998616,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 76.23397030000342,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 77.23398930000258,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 78.23893649998354,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 79.2440166999877,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 80.2488730000041,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 81.24891059999936,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 82.2538945999986,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 83.25391410000157,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 84.25393969999277,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 85.25887039999361,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 86.26391129998956,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 87.26874749999843,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 88.26876019997871,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 89.26880619997974,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 90.26881499998854,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 91.26891769998474,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 92.27387219999218,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 93.27880589998676,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 94.28360709999106,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 95.28413859999273,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 96.28872809998575,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 97.288899999985,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 98.29370290000224,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 99.29856029999792,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 100.29865680000512,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 101.30357099999674,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 102.30365089999395,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 103.30865029999404,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 104.30899229997885,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 105.3137009999773,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 106.31860169998254,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 107.3234919999959,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 108.32356019999133,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 109.32849220000207,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 110.33337409998057,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 111.33349200000521,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 112.33845479998854,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 113.34342849999666,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 114.34344019999844,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 115.34349830000428,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 116.34352009999566,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 117.34838359997957,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 118.3484327000042,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 119.35334859997965,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 120.35337349999463,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 121.35828899999615,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 122.35832189998473,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 123.35836039998685,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 124.35840779999853,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 125.36337529998855,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 126.3634383000026,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 127.36817319999682,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 128.37314089998836,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 129.37818219998735,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 130.37822909999522,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 131.38322190000326,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 132.38809249998303,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 133.38816750000115,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 134.38822279998567,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 135.3931560999772,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 136.39317179998034,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 137.39817030000268,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 138.40318169997772,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 139.40821329999017,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 140.41297750000376,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 141.41304729998228,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 142.41805340000428,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 143.4228957000014,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 144.42294160000165,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 145.42313519999152,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 146.42809780000243,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 147.43295220000437,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 148.438067399984,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 149.43810189998476,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 150.44289539998863,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 151.44298999998136,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 152.4479652000009,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 153.45277659999556,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 154.45347279999987,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 155.45783509998,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 156.46289739999338,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 157.46289799999795,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 158.46780789998593,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 159.4678711000015,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 160.47265319997678,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 161.47296610000194,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 162.4778718999878,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 163.4828039999993,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 164.48774949999643,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 165.4878408999939,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 166.49276659998577,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 167.49777889999677,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 168.50260619999608,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 169.50756709999405,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 170.50776290000067,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 171.51271519999136,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 172.5176991999906,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 173.51776379998773,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 174.52254079998238,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 175.52261949999956,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 176.52754159999313,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 177.52760050000506,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 178.5325448999938,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 179.53268340000068,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 180.53746389999287,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 181.53755869998713,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 182.5376686999807,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 183.5425337999768,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 184.54735429998254,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 185.54743089998374,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 186.54755319998367,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 187.55240489999414,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 188.55258799999137,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 189.55742389999796,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 190.56238089999533,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 191.562672799977,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 192.56746900000144,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 193.56748109997716,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 194.57230619998882,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 195.57232700000168,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 196.57236199997715,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 197.5723928999796,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 198.5774248999951,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 199.58222959999694,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 200.58227250000346,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 201.58244769999874,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 202.5872429999872,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 203.58727339998586,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 204.59236199999577,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 205.59713089998695,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 206.59731039998587,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 207.60222629999043,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 208.60227459997986,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 209.60727939999197,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 210.60730059997877,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 211.6121857999824,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 212.6122002999764,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 213.61717369998223,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 214.6220489999978,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 215.62221859997953,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 216.6269764000026,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 217.6271000999841,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 218.63198029997875,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 219.6320868000039,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 220.6321713999787,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 221.6372960000008,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 222.64202400000067,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 223.64698069999577,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 224.65205609999248,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 225.65695380000398,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 226.65696929997648,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 227.6619049999863,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 228.66208929999266,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 229.66210389998741,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 230.66690290000406,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 231.66690809998545,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 232.66693680000026,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 233.67180319997715,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 234.67182749998756,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 235.6768075999862,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 236.67685170000186,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 237.68166479998035,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 238.6818307999929,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 239.68678170000203,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 240.68691409999155,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 241.69173239998054,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 242.69671550000203,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 243.69679739998537,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 244.70166199997766,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 245.70671679999214,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 246.7067251999979,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 247.7115491000004,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 248.71174299999257,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 249.7118238999974,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 250.7166868999775,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 251.72160129999975,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 252.72646069998154,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 253.7266313,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 254.72669589999714,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 255.73152869998012,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 256.7315927000018,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 257.7365888999775,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 258.7414676999906,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 259.7463795999938,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 260.7465612999804,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 261.7466015999962,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 262.7514474999916,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 263.7515538999869,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 264.7564924999897,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 265.75652339999215,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 266.76150339999003,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 267.7664279000019,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 268.7665509999788,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 269.7712782000017,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 270.7714144999918,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 271.77647349998006,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 272.78157769999234,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 273.78644279998844,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 274.7913821999973,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 275.79617859999416,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 276.7962509999925,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 277.7962871999771,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 278.80139089998556,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 279.8062333999842,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 280.8063007000019,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 281.8112176999857,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 282.811237899994,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 283.81619759998284,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 284.8162543999788,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 285.821223499981,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 286.8262377999781,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 287.83107179999934,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 288.8314575999975,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 289.8361537999881,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 290.8362422999926,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 291.8411167000013,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 292.8461027999874,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 293.8511676999915,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 294.856002799992,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 295.85612059998675,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 296.8610331999953,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 297.8660197999852,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 298.8710510999954,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 299.87108119999175,
+          "unread_per_channel": 0
+        }
+      ]
+    },
+    {
+      "summary": {
+        "method": "callback",
+        "repeat": 3,
+        "device": "Dev2",
+        "channels": "Dev2/ai0,Dev2/ai1,Dev2/ai2",
+        "terminal": "DIFF",
+        "min_v": -10,
+        "max_v": 10,
+        "requested_rate_per_channel": 100000,
+        "requested_chunk_ms": 5.0,
+        "chunk_samples_per_channel": 500,
+        "requested_seconds": 300.0,
+        "warmup_seconds": 2,
+        "poll_ms": null,
+        "status": "completed",
+        "error_code": null,
+        "error": null,
+        "actual_rate_per_channel": 100000.0,
+        "input_buffer_samples_per_channel": 100000,
+        "actual_chunk_ms": 5.0,
+        "end_unread_per_channel": 0,
+        "acquired_per_channel_including_warmup": 30195000,
+        "measured_seconds": 300.0010438999743,
+        "reads": 60001,
+        "samples_per_channel": 30000500,
+        "delivered_samples_per_channel_s": 100001.31869541993,
+        "cpu_percent_one_core": 4.499984341554871,
+        "backlog_after_read_mean": 0.0,
+        "backlog_after_read_max": 0,
+        "backlog_slope_samples_per_channel_s": 0.0,
+        "return_interval_max_ms": 7.1112999867182225,
+        "read_duration_max_ms": 0.8577000116929412,
+        "distribution_reads_retained": 60001,
+        "distribution_truncated": false,
+        "return_interval_ms_p50": 4.9992999993264675,
+        "return_interval_ms_p99": 5.254499992588535,
+        "read_duration_ms_p50": 0.09849999332800508,
+        "read_duration_ms_p99": 0.2125999890267849,
+        "batch_samples_per_channel_p50": 500.0,
+        "batch_samples_per_channel_p99": 500.0
+      },
+      "backlog_timeline": [
+        {
+          "elapsed_s": 0.0049183999944943935,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 1.0099790999956895,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 2.0149453999765683,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 3.020110699988436,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 4.024950199993327,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 5.02497939998284,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 6.029856999986805,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 7.029887699987739,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 8.03494299997692,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 9.039872199995443,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 10.044818899972597,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 11.049834499979625,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 12.049911599984625,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 13.054742399981478,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 14.054865399986738,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 15.059821099974215,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 16.059876699990127,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 17.064690699975472,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 18.06475949997548,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 19.064802099979715,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 20.06968039998901,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 21.069712299999082,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 22.074771299987333,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 23.079631099972175,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 24.079701899987413,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 25.084737899975153,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 26.08966529997997,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 27.089751499996055,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 28.094474799989257,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 29.094491999974707,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 30.094513199990615,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 31.099449199973606,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 32.09948929998791,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 33.10445669997716,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 34.10449289999087,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 35.104494599974714,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 36.10454599998775,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 37.10938589999569,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 38.109390300000086,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 39.11443279997911,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 40.11939349997556,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 41.12435159998131,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 42.12438429999747,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 43.1292800999945,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 44.129327799979364,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 45.1294461999787,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 46.13424749998376,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 47.13435659999959,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 48.13927759998478,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 49.144312899996294,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 50.149290599976666,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 51.15417909997632,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 52.15919489998487,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 53.15922469997895,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 54.16412189998664,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 55.164301599987084,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 56.169169399974635,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 57.174197699991055,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 58.1791953999782,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 59.184106599976076,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 60.18415969997295,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 61.18910259997938,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 62.1891058999754,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 63.194175899989204,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 64.19895449999603,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 65.19898789998842,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 66.19899549998809,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 67.19908049999503,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 68.20404829998733,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 69.20408329999191,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 70.20906129997456,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 71.21393579998403,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 72.21409249998396,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 73.21899219998159,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 74.22398909999174,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 75.22888439998496,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 76.22896019998007,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 77.23400819997187,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 78.23895299999276,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 79.243902599992,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 80.24397619999945,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 81.24886639998294,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 82.248886699992,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 83.24898089998169,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 84.25376089999918,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 85.25397319998592,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 86.25885459998972,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 87.25888769997982,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 88.26380309998058,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 89.26878709997982,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 90.27378239997779,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 91.27380239998456,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 92.2738348999992,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 93.27877969999099,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 94.28385869998601,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 95.28872219999903,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 96.29375029998482,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 97.29870929999743,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 98.30368089998956,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 99.30873279998195,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 100.31372279999778,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 101.31868969998322,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 102.32370329997502,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 103.32864749999135,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 104.33360619997256,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 105.33367189997807,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 106.33866969999508,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 107.34358359998441,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 108.34862229999271,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 109.35359879999305,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 110.35846379998839,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 111.36339929999667,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 112.36846609998611,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 113.3684805999801,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 114.36854939998011,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 115.37346759997308,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 116.37839049997274,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 117.37847699999111,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 118.3833917999873,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 119.38353689998621,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 120.3883437999757,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 121.38843029999407,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 122.38843449999695,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 123.3884521999862,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 124.39330449997215,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 125.39838299999246,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 126.40338789997622,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 127.4082866999961,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 128.41327719998662,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 129.41343319998123,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 130.4181984999741,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 131.42317129997537,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 132.42318709997926,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 133.42333529997268,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 134.42829289997462,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 135.4332255999907,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 136.43326809999417,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 137.4381917999999,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 138.44310499998392,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 139.44318659999408,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 140.44801779999398,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 141.4480769999791,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 142.45305399998324,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 143.45796609998797,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 144.4581861999759,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 145.46303849999094,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 146.4631901999819,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 147.46805629998562,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 148.4730349999736,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 149.4779179999896,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 150.47799759998452,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 151.48294569997233,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 152.48300499998732,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 153.48303929998656,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 154.48324259999208,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 155.48793679999653,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 156.48805729998276,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 157.49297489997116,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 158.4979257999803,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 159.50290229998063,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 160.50781309997546,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 161.50789339997573,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 162.5127652999945,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 163.51283389999298,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 164.51290259999223,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 165.51774279997335,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 166.52275069997995,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 167.52292069999385,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 168.52772939999704,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 169.52777979997336,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 170.5326879999775,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 171.53767009999137,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 172.53767659998266,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 173.53768199999467,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 174.5377080999897,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 175.5426597999758,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 176.54280019999715,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 177.54782819998218,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 178.5478935999854,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 179.55243739997968,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 180.55254529998638,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 181.55265609998605,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 182.5575748999836,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 183.56256069999654,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 184.5625682999962,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 185.56747359997826,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 186.56754609997733,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 187.57234839999,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 188.57250189999468,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 189.5725848999864,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 190.57756129998597,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 191.58244449997437,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 192.58740149997175,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 193.5923867999809,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 194.59243499999866,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 195.59244879998732,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 196.59735989998444,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 197.59740699999384,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 198.6022700999747,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 199.60233199998038,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 200.607336999994,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 201.60767909997958,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 202.61225389997708,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 203.61733299997286,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 204.62228529999265,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 205.62725069999578,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 206.63224839998293,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 207.6372736999765,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 208.64221759999054,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 209.6422388999781,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 210.6472581999842,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 211.65221059997566,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 212.65715669997735,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 213.65739999999641,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 214.66216619999614,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 215.66703769998276,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 216.66720769999665,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 217.67203549999977,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 218.67212239999208,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 219.6722449999943,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 220.6771938999882,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 221.67720799997915,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 222.68202579999343,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 223.68686449999223,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 224.68705519998912,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 225.6919660999847,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 226.69199049999588,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 227.6969561999722,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 228.6970024999755,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 229.70184229998267,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 230.70193259997177,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 231.70678329997463,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 232.70678759997827,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 233.7069147999864,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 234.706981299998,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 235.7117964999925,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 236.7118489999848,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 237.71678919999977,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 238.72174799998174,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 239.72670209998614,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 240.72687619997305,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 241.73173749999842,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 242.73176749999402,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 243.736739999993,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 244.73675159999402,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 245.741712499992,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 246.7417421999853,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 247.74668449998717,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 248.75167689999216,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 249.75171519999276,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 250.75650509999832,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 251.75667350000003,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 252.7616568999947,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 253.76659789998666,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 254.76673089998076,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 255.77162419998785,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 256.77645199999097,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 257.7814902999962,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 258.7815549999941,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 259.78657059997204,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 260.7914711999765,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 261.79149669999606,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 262.7918047999847,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 263.79652589999023,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 264.79662749997806,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 265.8014070999925,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 266.80152549999184,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 267.80643199998303,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 268.81142869999167,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 269.8114947999711,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 270.8163200999843,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 271.8163888999843,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 272.8213400999957,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 273.82159459998365,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 274.826268099976,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 275.8265068999899,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 276.83134469998186,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 277.8315875999979,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 278.83628409999073,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 279.836453899974,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 280.8413815999811,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 281.8464859999949,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 282.85144329999457,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 283.8564282999723,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 284.86152949999087,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 285.86627979998593,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 286.87116319997585,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 287.87604849998024,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 288.88107319999835,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 289.8811638999905,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 290.88597579998896,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 291.8860025999893,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 292.8861067999969,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 293.8911217999994,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 294.89602269997704,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 295.9009804999805,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 296.90599839997594,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 297.9060025999788,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 298.911025599984,
+          "unread_per_channel": 0
+        },
+        {
+          "elapsed_s": 299.9110571999918,
+          "unread_per_channel": 0
+        }
+      ]
+    }
+  ]
+}
