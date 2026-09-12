@@ -12,6 +12,7 @@ class PfiMonitorTests(unittest.TestCase):
         config = PfiMonitorConfig(pfi0_poll_interval_s=0.2, pfi1_poll_interval_s=0.03)
         self.assertEqual(config.pfi0_poll_interval_s, 0.2)
         self.assertEqual(config.pfi1_poll_interval_s, 0.03)
+        self.assertEqual(config.pfi1_edge, "FALLING")
 
 
 if __name__ == "__main__":

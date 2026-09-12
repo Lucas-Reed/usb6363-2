@@ -29,6 +29,7 @@ class Pfi1WindowCapture:
             rate_per_channel=self.config.rate_per_channel,
             trigger_enabled=True,
             trigger_source="PFI1",
+            trigger_edge="FALLING",
             timeout=self.config.timeout,
         )
 

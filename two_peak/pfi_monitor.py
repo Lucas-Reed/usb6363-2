@@ -13,12 +13,16 @@ from typing import Callable
 class PfiMonitorConfig:
     pfi0_poll_interval_s: float = 0.05
     pfi1_poll_interval_s: float = 0.01
+    pfi0_edge: str = "RISING"
+    pfi1_edge: str = "FALLING"
 
     def __post_init__(self) -> None:
         if self.pfi0_poll_interval_s <= 0 or self.pfi1_poll_interval_s <= 0:
             raise ValueError("poll intervals must be positive")
         if self.pfi1_poll_interval_s >= self.pfi0_poll_interval_s:
             raise ValueError("PFI1 must be polled more frequently than PFI0")
+        if self.pfi0_edge.upper() not in {"RISING", "FALLING"} or self.pfi1_edge.upper() not in {"RISING", "FALLING"}:
+            raise ValueError("PFI edges must be RISING or FALLING")
 
 
 @dataclass(frozen=True)
@@ -61,14 +65,14 @@ class PfiCounterMonitor:
             now = time.monotonic()
             changed0 = changed1 = False
             if now >= next0:
-                count0 = int(self.read_count("PFI0"))
+                count0 = int(self._read("PFI0", self.config.pfi0_edge))
                 changed0 = self._last0 is not None and count0 != self._last0
                 self._last0 = count0
                 next0 = now + self.config.pfi0_poll_interval_s
             else:
                 count0 = self._last0 if self._last0 is not None else 0
             if now >= next1:
-                count1 = int(self.read_count("PFI1"))
+                count1 = int(self._read("PFI1", self.config.pfi1_edge))
                 changed1 = self._last1 is not None and count1 != self._last1
                 self._last1 = count1
                 next1 = now + self.config.pfi1_poll_interval_s
@@ -78,3 +82,9 @@ class PfiCounterMonitor:
                 if self.on_event:
                     self.on_event(PfiMonitorEvent(time.time(), count0, count1, changed0, changed1))
             self._stop.wait(min(next0, next1) - time.monotonic())
+
+    def _read(self, line: str, edge: str) -> int:
+        try:
+            return int(self.read_count(line, edge))
+        except TypeError:
+            return int(self.read_count(line))
