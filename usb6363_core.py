@@ -26,6 +26,7 @@ from typing import Any
 import numpy as np
 
 from usb6363 import nidaqmx_driver
+from two_peak.pfi_monitor import PfiMonitorConfig, PfiCounterMonitor, PfiMonitorEvent
 
 
 # NI MAX / NI-DAQmx 里给 USB-6363 设置的设备名。
@@ -93,6 +94,14 @@ class DaqController:
 
         # 用于保护短硬件操作，例如 AO、PFI、单点 AI。
         self._hardware_lock = threading.RLock()
+
+        # Persistent PFI counter monitor owns its two counter tasks in this process.
+        self._pfi_monitor_lock = threading.RLock()
+        self._pfi_monitor: PfiCounterMonitor | None = None
+        self._pfi_monitor_tasks: dict[str, Any] = {}
+        self._pfi_monitor_started_at = 0.0
+        self._pfi_monitor_last_event: dict[str, Any] | None = None
+        self._pfi_monitor_error: str | None = None
 
         # 用于保护后台 AI 采样状态。
         self._ai_lock = threading.RLock()
@@ -1238,6 +1247,67 @@ class DaqController:
     @staticmethod
     def stop_pfi_counter(task: Any) -> None:
         task.close()
+
+    def start_pfi_monitor(
+        self,
+        pfi0_interval_s: float = 0.05,
+        pfi1_interval_s: float = 0.01,
+        pfi0_edge: str = "RISING",
+        pfi1_edge: str = "FALLING",
+        pfi0_counter: str = "ctr0",
+        pfi1_counter: str = "ctr1",
+    ) -> dict[str, Any]:
+        """Start persistent PFI0/PFI1 edge counters and polling monitor."""
+        config = PfiMonitorConfig(pfi0_interval_s, pfi1_interval_s, pfi0_edge, pfi1_edge)
+        with self._pfi_monitor_lock:
+            if self._pfi_monitor is not None:
+                raise RuntimeError("PFI monitor already running")
+            tasks: dict[str, Any] = {}
+            try:
+                tasks["PFI0"] = self.start_pfi_counter("PFI0", pfi0_counter, config.pfi0_edge)["task"]
+                tasks["PFI1"] = self.start_pfi_counter("PFI1", pfi1_counter, config.pfi1_edge)["task"]
+                def on_event(event: PfiMonitorEvent) -> None:
+                    with self._pfi_monitor_lock:
+                        self._pfi_monitor_last_event = event.__dict__.copy()
+                monitor = PfiCounterMonitor(lambda line, edge: self.read_pfi_counter(tasks[line]), config, on_event)
+                monitor.start()
+                self._pfi_monitor_tasks = tasks
+                self._pfi_monitor = monitor
+                self._pfi_monitor_started_at = time.time()
+                self._pfi_monitor_error = None
+                return self.get_pfi_monitor_status()
+            except Exception:
+                for task in tasks.values():
+                    task.close()
+                raise
+
+    def stop_pfi_monitor(self) -> dict[str, Any]:
+        with self._pfi_monitor_lock:
+            monitor = self._pfi_monitor
+            tasks = list(self._pfi_monitor_tasks.values())
+            self._pfi_monitor = None
+            self._pfi_monitor_tasks = {}
+            self._pfi_monitor_started_at = 0.0
+        if monitor is not None:
+            monitor.stop()
+        for task in tasks:
+            task.close()
+        return self.get_pfi_monitor_status()
+
+    def get_pfi_monitor_status(self) -> dict[str, Any]:
+        with self._pfi_monitor_lock:
+            monitor = self._pfi_monitor
+            config = monitor.config if monitor is not None else None
+            return {
+                "running": bool(monitor is not None and monitor._thread and monitor._thread.is_alive()),
+                "started_at": self._pfi_monitor_started_at or None,
+                "config": ({"pfi0_poll_interval_s": config.pfi0_poll_interval_s,
+                            "pfi1_poll_interval_s": config.pfi1_poll_interval_s,
+                            "pfi0_edge": config.pfi0_edge.upper(), "pfi1_edge": config.pfi1_edge.upper()}
+                           if config else None),
+                "last_event": self._pfi_monitor_last_event,
+                "error": self._pfi_monitor_error,
+            }
 
     # ---------------------------------------------------------------------
     # 内部 AI 线程

@@ -542,6 +542,23 @@ class Usb6363Client:
             },
         )
 
+    def start_pfi_monitor(
+        self, pfi0_interval_s: float = 0.05, pfi1_interval_s: float = 0.01,
+        pfi0_edge: str = "RISING", pfi1_edge: str = "FALLING",
+        pfi0_counter: str = "ctr0", pfi1_counter: str = "ctr1",
+    ) -> dict[str, Any]:
+        return self._post("/api/pfi/monitor/start", {
+            "pfi0_interval_s": pfi0_interval_s, "pfi1_interval_s": pfi1_interval_s,
+            "pfi0_edge": pfi0_edge, "pfi1_edge": pfi1_edge,
+            "pfi0_counter": pfi0_counter, "pfi1_counter": pfi1_counter,
+        })
+
+    def stop_pfi_monitor(self) -> dict[str, Any]:
+        return self._post("/api/pfi/monitor/stop", {})
+
+    def pfi_monitor_status(self) -> dict[str, Any]:
+        return self._get("/api/pfi/monitor/status")
+
     def _get(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
         """发送 GET 请求。普通使用者通常不需要直接调用这个函数。"""
 

@@ -32,6 +32,8 @@ from two_peak.signal import (
     track_and_measure_manual_area,
 )
 from two_peak.window_voltage_recorder import WindowVoltageRecorder
+from two_peak.pfi_frame_coordinator import PfiFrameCoordinator
+from two_peak.pfi_monitor import PfiMonitorEvent
 from usb6363_client import Usb6363Client
 
 
@@ -73,7 +75,12 @@ class AreaTrendLogger:
     WebUI 可以关闭或刷新，只要 viewer 后端还在运行，本 logger 就能继续记录。
     """
 
-    def __init__(self, daq: Usb6363Client, output_dir: Path) -> None:
+    def __init__(
+        self,
+        daq: Usb6363Client,
+        output_dir: Path,
+        pfi_coordinator: PfiFrameCoordinator | None = None,
+    ) -> None:
         self._daq = daq
         self._output_dir = output_dir
         self._lock = threading.Lock()
@@ -96,6 +103,7 @@ class AreaTrendLogger:
         # 这样面积、峰高、Top 和 NPZ 不会在同一帧混用新旧边界。
         self._pending_window_update: dict[str, Any] | None = None
         self._window_revision = 0
+        self._pfi_coordinator = pfi_coordinator
 
     def start(
         self,
@@ -121,6 +129,8 @@ class AreaTrendLogger:
         session_id: str | None = None,
         trigger_unix_time: float | None = None,
         start_after_frame_id: int = 0,
+        pfi_frame_admission_enabled: bool = False,
+        pfi_coordinator: PfiFrameCoordinator | None = None,
     ) -> dict[str, Any]:
         """启动长期记录。
 
@@ -215,6 +225,7 @@ class AreaTrendLogger:
                 "session_id": actual_session_id,
                 "trigger_unix_time": trigger_unix_time,
                 "start_after_frame_id": actual_start_after_frame_id,
+                "pfi_frame_admission_enabled": bool(pfi_frame_admission_enabled),
                 "window_revision": 1,
             }
 
@@ -253,6 +264,12 @@ class AreaTrendLogger:
             self._stop_reason = None
             self._pending_window_update = None
             self._window_revision = 1
+            coordinator = pfi_coordinator or self._pfi_coordinator
+            if coordinator is None:
+                coordinator = PfiFrameCoordinator(enabled=bool(pfi_frame_admission_enabled))
+            else:
+                coordinator.gate.enabled = bool(pfi_frame_admission_enabled)
+            self._pfi_coordinator = coordinator
             try:
                 thread.start()
             except Exception:
@@ -263,6 +280,12 @@ class AreaTrendLogger:
                 raise
 
         return self.status()
+
+    def on_pfi_counter_event(self, event: PfiMonitorEvent) -> None:
+        """Forward a counter observation to the active frame admission coordinator."""
+        coordinator = self._pfi_coordinator
+        if coordinator is not None:
+            coordinator.on_counter_event(event)
 
     def update_area_windows(
         self,
@@ -456,6 +479,31 @@ class AreaTrendLogger:
                             last_seen_frame_id,
                             status,
                         )
+                        coordinator = self._pfi_coordinator
+                        admitted_frames: list[dict[str, Any]] = []
+                        gap_error: FrameHistoryError | None = None
+                        for raw_frame in frames:
+                            frame_id = int(raw_frame.get("frame_id", 0))
+                            expected_frame_id = last_seen_frame_id + 1
+                            if (
+                                settings.get("stream_source") == "unified_stream"
+                                and frame_id != expected_frame_id
+                            ):
+                                gap_error = FrameHistoryError(
+                                    "统一 AI 历史帧不连续："
+                                    f"期望 frame_id={expected_frame_id}，实际得到 {frame_id}。"
+                                    "记录已停止，避免生成带有隐藏缺口的数据。"
+                                )
+                                break
+                            # The raw stream remains contiguous even when admission
+                            # intentionally drops a frame; advance this cursor first.
+                            last_seen_frame_id = frame_id
+                            admitted_frames.extend(
+                                coordinator.submit_frame(raw_frame)
+                                if coordinator is not None
+                                else [raw_frame]
+                            )
+                        frames = admitted_frames
                         for frame in frames:
                             with self._lock:
                                 window_update = self._pending_window_update
@@ -474,18 +522,6 @@ class AreaTrendLogger:
                                 top_ema = None
                                 top2_ema = None
 
-                            frame_id = int(frame.get("frame_id", 0))
-                            expected_frame_id = last_seen_frame_id + 1
-                            if (
-                                settings.get("stream_source") == "unified_stream"
-                                and frame_id != expected_frame_id
-                            ):
-                                raise FrameHistoryError(
-                                    "统一 AI 历史帧不连续："
-                                    f"期望 frame_id={expected_frame_id}，实际得到 {frame_id}。"
-                                    "记录已停止，避免生成带有隐藏缺口的数据。"
-                                )
-
                             sample = self._measure_frame(frame, settings)
                             samples.append(sample)
                             if voltage_recorder is not None:
@@ -502,7 +538,6 @@ class AreaTrendLogger:
                                         ),
                                     )
                                 )
-                            last_seen_frame_id = sample.frame_id
                             with self._lock:
                                 self._frames_seen += 1
                                 self._last_frame_id = sample.frame_id
@@ -576,6 +611,9 @@ class AreaTrendLogger:
                                 while next_record_timestamp <= sample.timestamp + 1e-9:
                                     next_record_timestamp += record_period
 
+                        if gap_error is not None:
+                            raise gap_error
+
                         if voltage_recorder is not None:
                             voltage_error = voltage_recorder.status().get("error")
                             if voltage_error:
@@ -596,6 +634,8 @@ class AreaTrendLogger:
                     time.sleep(float(settings["poll_interval"]))
 
         finally:
+            if self._pfi_coordinator is not None:
+                self._pfi_coordinator.flush()
             if voltage_recorder is not None:
                 recorder_status = voltage_recorder.stop()
                 if recorder_status.get("error"):

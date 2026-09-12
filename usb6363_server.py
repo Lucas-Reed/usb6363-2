@@ -116,6 +116,8 @@ def make_handler(controller: DaqController):
                 elif parsed.path == "/api/pfi/count":
                     # 在指定时间内，统计某个 PFI 的上升沿/下降沿数量。
                     self._send_json(controller.count_pfi_edges(**_pfi_count_args(query)))
+                elif parsed.path == "/api/pfi/monitor/status":
+                    self._send_json(controller.get_pfi_monitor_status())
                 else:
                     self._send_error(HTTPStatus.NOT_FOUND, "Unknown route")
             except Exception as exc:
@@ -171,6 +173,10 @@ def make_handler(controller: DaqController):
                 elif parsed.path == "/api/pfi/write":
                     # 写 PFI 或数字线电平。请求体例如 {"line": "PFI0", "value": true}。
                     self._send_json(controller.write_digital_line(**_digital_write_args(body)))
+                elif parsed.path == "/api/pfi/monitor/start":
+                    self._send_json(controller.start_pfi_monitor(**_pfi_monitor_args(body)))
+                elif parsed.path == "/api/pfi/monitor/stop":
+                    self._send_json(controller.stop_pfi_monitor())
                 else:
                     self._send_error(HTTPStatus.NOT_FOUND, "Unknown route")
             except Exception as exc:
@@ -412,6 +418,17 @@ def _pfi_count_args(query: dict[str, list[str]]) -> dict[str, Any]:
         "seconds": float(_first(query, "seconds", 1.0)),
         "edge": str(_first(query, "edge", "RISING")),
         "timeout": float(_first(query, "timeout", 10.0)),
+    }
+
+
+def _pfi_monitor_args(body: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "pfi0_interval_s": float(body.get("pfi0_interval_s", 0.05)),
+        "pfi1_interval_s": float(body.get("pfi1_interval_s", 0.01)),
+        "pfi0_edge": str(body.get("pfi0_edge", "RISING")),
+        "pfi1_edge": str(body.get("pfi1_edge", "FALLING")),
+        "pfi0_counter": str(body.get("pfi0_counter", "ctr0")),
+        "pfi1_counter": str(body.get("pfi1_counter", "ctr1")),
     }
 
 
