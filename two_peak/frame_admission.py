@@ -22,6 +22,7 @@ class FrameAdmissionGate:
         self.enabled = bool(enabled)
         self._pending: PendingFrame | None = None
         self.rejected_frame_ids: list[int] = []
+        self.rejected_frames: list[Any] = []
 
     def push(self, frame: Any, *, pfi1_count: int) -> list[Any]:
         """Push a frame at its start/boundary and return newly accepted frames.
@@ -40,6 +41,7 @@ class FrameAdmissionGate:
                 accepted.append(previous.frame)
             else:
                 self.rejected_frame_ids.append(previous.frame_id)
+                self.rejected_frames.append(previous.frame)
         self._pending = PendingFrame(frame_id, frame, count)
         return accepted
 
