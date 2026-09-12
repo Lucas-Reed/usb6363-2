@@ -88,3 +88,15 @@ class PfiCounterMonitor:
             return int(self.read_count(line, edge))
         except TypeError:
             return int(self.read_count(line))
+
+
+class PersistentPfiCounterMonitor(PfiCounterMonitor):
+    """Monitor using already-created persistent counter tasks."""
+
+    def __init__(self, pfi0_task, pfi1_task, config: PfiMonitorConfig = PfiMonitorConfig(),
+                 on_event: Callable[[PfiMonitorEvent], None] | None = None):
+        self._tasks = {"PFI0": pfi0_task, "PFI1": pfi1_task}
+        super().__init__(self._read_task, config, on_event)
+
+    def _read_task(self, line: str, _edge: str) -> int:
+        return int(self._tasks[line].read(timeout=1.0))
