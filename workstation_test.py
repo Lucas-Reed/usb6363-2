@@ -34,7 +34,7 @@ def run_hardware_checks(base_url: str, device: str) -> bool:
     status = get_json(base_url + "/api/ai/unified/status")
     checks.append(("unified status readable", isinstance(status, dict), status))
     for terminal, label in (("PFI0", "PFI0 counter"), ("PFI1", "PFI1 counter")):
-        query = urllib.parse.urlencode({"device": device, "terminal": terminal, "duration": "0.1"})
+        query = urllib.parse.urlencode({"line": terminal, "counter": "ctr0", "seconds": "0.1"})
         try:
             value = get_json(base_url + "/api/pfi/count?" + query)
             checks.append((label, isinstance(value, dict) and "count" in value, value))
@@ -56,7 +56,8 @@ def main() -> int:
         try:
             ok = run_hardware_checks(args.base_url, args.device) and ok
         except Exception as exc:
-            print(f"[FAIL] hardware checks: {exc}")
+            print(f"[NOT RUN] hardware checks: {exc}")
+            print("Start the core service first: powershell -ExecutionPolicy Bypass -File .\\manage_services.ps1 -Action Start")
             ok = False
     print("RESULT:", "PASS" if ok else "FAIL")
     return 0 if ok else 1
