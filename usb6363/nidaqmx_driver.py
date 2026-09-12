@@ -344,6 +344,30 @@ def count_pfi_edges(
     }
 
 
+class ContinuousPfiCounter:
+    """Persistent counter task for low-overhead cumulative PFI polling."""
+
+    def __init__(self, device_name: str, terminal: str, physical_counter: str, edge_name: str):
+        _get_device(device_name)
+        nidaqmx_module, _, _, _, _ = _load_nidaqmx()
+        self._task = nidaqmx_module.Task()
+        edge_value = _edge(edge_name)
+        channel = self._task.ci_channels.add_ci_count_edges_chan(
+            physical_counter, edge=edge_value, initial_count=0
+        )
+        channel.ci_count_edges_term = terminal
+        self.edge = edge_value.name
+        self.terminal = terminal
+        self.counter = physical_counter
+        self._task.start()
+
+    def read(self, timeout: float = 1.0) -> int:
+        return int(self._task.read(timeout=timeout))
+
+    def close(self) -> None:
+        self._task.close()
+
+
 def split_ai_read_values(raw_values: Any, channel_count: int) -> list[list[float]]:
     """把 nidaqmx.Task.read 的返回值统一整理成 list[list[float]]。"""
 

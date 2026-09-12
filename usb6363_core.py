@@ -1219,6 +1219,26 @@ class DaqController:
             "count": result["count"],
         }
 
+    def start_pfi_counter(self, line: str = "PFI0", counter: str = "ctr0",
+                          edge: str = "RISING") -> dict[str, Any]:
+        """Start a persistent cumulative PFI counter task."""
+        terminal = self._normalize_pfi_terminal(line)
+        physical_counter = self._normalize_counter(counter)
+        with self._hardware_lock:
+            task = nidaqmx_driver.ContinuousPfiCounter(
+                self.device_name, terminal, physical_counter, edge
+            )
+        return {"device": self.device_name, "line": terminal, "counter": physical_counter,
+                "edge": task.edge, "task": task}
+
+    @staticmethod
+    def read_pfi_counter(task: Any, timeout: float = 1.0) -> int:
+        return int(task.read(timeout=timeout))
+
+    @staticmethod
+    def stop_pfi_counter(task: Any) -> None:
+        task.close()
+
     # ---------------------------------------------------------------------
     # 内部 AI 线程
     # ---------------------------------------------------------------------
